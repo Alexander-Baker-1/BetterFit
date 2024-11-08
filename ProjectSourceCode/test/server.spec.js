@@ -1,6 +1,6 @@
 // ********************** Initialize server **********************************
 
-const server = require('../index'); //TODO: Make sure the path to your index.js is correctly added
+const server = require('../index.js');
 
 // ********************** Import Libraries ***********************************
 
@@ -30,3 +30,29 @@ describe('Server!', () => {
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
 
 // ********************************************************************************
+describe('Testing Add User API', () => {
+    it('should register a new user successfully and redirect to /login', done => {
+      chai
+        .request(server)
+        .post('/register')
+        .send({ fullname: 'MJ', username: 'uniqueUser', password: 'password123' })
+        .end((err, res) => {
+          // expect(res).to.have.status(302); // Check for redirect status
+          res.should.redirectTo('/login'); // Ensure it redirects to /login on success
+          done();
+        });
+    });
+  
+    it('should fail when the username is already taken and redirect to /register', done => {
+      chai
+        .request(server)
+        .post('/register')
+        .send({ fullname: 'MJ', username: 'uniqueUser', password: 'password123' })
+        .end((err, res) => {
+          expect(res).to.have.status(200); // Check for redirect status
+          res.should.redirectTo( '/register'); // Ensure it redirects to /register on failure
+          done();
+        });
+    });
+  });
+  

@@ -6,6 +6,7 @@ const path = require('path');
 const pgp = require('pg-promise')();
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const bcrypt = require('bcryptjs'); //  To hash passwords
 
 // -------------------------------------  APP CONFIG   ----------------------------------------------
 
@@ -79,9 +80,11 @@ app.get('/register', (req, res) => {
 app.post('/register', async (req, res) => {
   console.log('Request body:', req.body);
   try {
-    const { username, password } = req.body;
+    const { fullname, username, password } = req.body;
+    console.log('Username:', fullname);
     console.log('Username:', username);
     console.log('Password:', password);
+     console.log('Username:', username);
     const existingUser = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
     console.log('Existing user:', existingUser);
     if (existingUser) {
@@ -92,8 +95,8 @@ app.post('/register', async (req, res) => {
     }
     console.log('Attempting to insert new user into database');
     const hash = await bcrypt.hash(password, 10);
-    await db.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hash]);
-    req.session.message = 'Registration successful! Please log in.';
+    await db.query('INSERT INTO users (fullname, username, password, ) VALUES ($1, $2, $3)', [fullname,username, hash]);
+        req.session.message = 'Registration successful! Please log in.';
     req.session.error = false;
     return res.redirect('/login');
   } catch (err) {
@@ -118,7 +121,7 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const username = req.body.username;
-  const query = 'select * from users where users.usernam = $1 LIMIT 1';
+  const query = 'select * from users where users.username = $1 LIMIT 1';
   const values = [email];
 
   db.one(query, values)
