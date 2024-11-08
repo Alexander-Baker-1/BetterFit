@@ -95,7 +95,7 @@ app.post('/register', async (req, res) => {
     }
     console.log('Attempting to insert new user into database');
     const hash = await bcrypt.hash(password, 10);
-    await db.query('INSERT INTO users (fullname, username, password, ) VALUES ($1, $2, $3)', [fullname,username, hash]);
+    await db.query('INSERT INTO users (fullname, username, password ) VALUES ($1, $2, $3)', [fullname,username, hash]);
         req.session.message = 'Registration successful! Please log in.';
     req.session.error = false;
     return res.redirect('/login');

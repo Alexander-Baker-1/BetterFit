@@ -35,10 +35,11 @@ describe('Testing Add User API', () => {
       chai
         .request(server)
         .post('/register')
-        .send({ fullname: 'MJ', username: 'uniqueUser', password: 'password123' })
+        .send({ fullname: 'MJ', username: 'mi', password: 'password123' })
+        .redirects(0)
         .end((err, res) => {
-          // expect(res).to.have.status(302); // Check for redirect status
-          res.should.redirectTo('/login'); // Ensure it redirects to /login on success
+          expect(res).to.have.status(302);
+          expect(res.headers['location']).to.include('/login'); // Check for path inclusion
           done();
         });
     });
@@ -47,10 +48,11 @@ describe('Testing Add User API', () => {
       chai
         .request(server)
         .post('/register')
-        .send({ fullname: 'MJ', username: 'uniqueUser', password: 'password123' })
+        .send({ fullname: 'MJ', username: 'uniqueUser', password: 'password123' }) // Use the same username for failure
+        .redirects(0)
         .end((err, res) => {
-          expect(res).to.have.status(200); // Check for redirect status
-          res.should.redirectTo( '/register'); // Ensure it redirects to /register on failure
+          expect(res).to.have.status(302);
+          expect(res.headers['location']).to.include('/register'); // Check for path inclusion
           done();
         });
     });
