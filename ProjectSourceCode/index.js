@@ -56,12 +56,59 @@ db.connect()
     console.log('ERROR', error.message || error);
   });
 
-// -------------------------------------  ROUTES for login.hbs   ----------------------------------------------
 const user = {
   username: undefined,
   first_name: undefined,
   last_name: undefined,
 };
+
+// -------------------------------------  ROUTES for register.hbs   ---------------------------------------------- 
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
+app.get('/register', (req, res) => {
+  const message = req.session.message || '';
+  const error = req.session.error || false;
+  req.session.message = '';
+  req.session.error = false;
+  res.render('pages/register', { message, error });
+});
+
+// Register
+app.post('/register', async (req, res) => {
+  console.log('Request body:', req.body);
+  try {
+    const { username, password } = req.body;
+    console.log('Username:', username);
+    console.log('Password:', password);
+    const existingUser = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
+    console.log('Existing user:', existingUser);
+    if (existingUser) {
+      console.log('Username already taken');
+      req.session.message = 'Username is already taken, please choose another one.';
+      req.session.error = true;
+      return res.redirect('/register');
+    }
+    console.log('Attempting to insert new user into database');
+    const hash = await bcrypt.hash(password, 10);
+    await db.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hash]);
+    req.session.message = 'Registration successful! Please log in.';
+    req.session.error = false;
+    return res.redirect('/login');
+  } catch (err) {
+    console.error('Error inserting into users table:', err);
+    req.session.message = 'An error occurred during registration. Please try again.';
+    req.session.error = true;
+    return res.redirect('/register');
+  }
+});
+
+// -------------------------------------  ROUTES for login.hbs   ----------------------------------------------
+
+app.get('/', (req, res) => {
+  res.redirect('/login'); //this will call the /login route in the API
+});
 
 app.get('/login', (req, res) => {
   res.render('pages/login');
@@ -71,7 +118,7 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const username = req.body.username;
-  const query = 'select * from students where students.email = $1 LIMIT 1';
+  const query = 'select * from users where users.usernam = $1 LIMIT 1';
   const values = [email];
 
   db.one(query, values)
@@ -120,5 +167,5 @@ app.get('/logout', (req, res) => {
 
 // -------------------------------------  START THE SERVER   ----------------------------------------------
 
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
