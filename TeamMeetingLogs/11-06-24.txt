@@ -1,0 +1,8 @@
+Minute Meeting Nov.6 :
+* Miguel and Alex approved Kayo’s pull request for merging exercise database todo
+* Kayo approved Alex’s pull request for login page todo
+* Miguel was assigned to creating the user database
+* Kayo was assigned to creating the exercises database
+* Yusuf was assigned to creating the recipes database
+* Alex was assigned to creating the login page
+* Minh was assigned to creating the register page
