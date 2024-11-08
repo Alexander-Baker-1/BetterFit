@@ -63,6 +63,9 @@ const user = {
 };
 
 // -------------------------------------  ROUTES for register.hbs   ---------------------------------------------- 
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
 
 app.get('/register', (req, res) => {
   const message = req.session.message || '';
