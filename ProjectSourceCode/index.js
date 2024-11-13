@@ -119,27 +119,40 @@ app.get('/login', (req, res) => {
 
 // Login submission
 app.post('/login', (req, res) => {
-  const email = req.body.email;
   const username = req.body.username;
-  const query = 'select * from users where users.username = $1 LIMIT 1';
-  const values = [email];
+  const password = req.body.password; // Assuming the password is also sent in the request body
+  const query = 'SELECT * FROM users WHERE users.username = $1 LIMIT 1';
+
+  // Array containing the username as a parameter to safely pass to the query
+  const values = [username];
 
   db.one(query, values)
     .then(data => {
-      user.username = username;
-      user.first_name = data.first_name;
-      user.last_name = data.last_name;
+      // Verify the password (assuming 'data.password' contains a hashed password)
+      if (bcrypt.compareSync(password, data.password)) {
+        const user = {
+          username: data.username,
+          fullname: data.fullname,
+        };
 
-      req.session.user = user;
-      req.session.save();
+        // Store the user object in the session
+        req.session.user = user;
+        req.session.save();
 
-      res.redirect('/');
+        // Redirect to the home page after successful login
+        res.redirect('pages/home');
+      } else {
+        // Password does not match
+        res.redirect('/login');
+      }
     })
     .catch(err => {
       console.log(err);
+      // In case no user is found or another error occurs
       res.redirect('/login');
     });
 });
+
 
 // Authentication middleware.
 const auth = (req, res, next) => {
@@ -150,6 +163,19 @@ const auth = (req, res, next) => {
 };
 
 app.use(auth);
+app.get('/profile', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).send('Not authenticated');
+  }
+  try {
+    res.status(200).json({
+      username: req.session.user.username,
+    });
+  } catch (err) {
+    console.error('Profile error:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 // -------------------------------------  ROUTES for home.hbs   ----------------------------------------------
 
