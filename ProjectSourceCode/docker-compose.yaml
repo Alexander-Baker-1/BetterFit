@@ -23,6 +23,6 @@ services:
       - '3000:3000'
     volumes:
       - ./:/ProjectSourceCode
-    command: 'npm run testandrun'
+    command: 'npm start'
 volumes:
   group-project:
