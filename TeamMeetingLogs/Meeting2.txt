@@ -1,0 +1,31 @@
+Meeting Minutes
+Date: 10/30/2024
+Time: [2:30 - 3:30]
+Location: [Discord]
+Attendees
+[Alex]
+[Kayo]
+[Miguel]
+[Minh]
+[Yusuf]
+
+
+3. Agenda Overview
+We discussed how we were going to tackle this project and if we were going to use asana or github for our project board. We also assigned different issue and who was going to tackle what section of the project
+
+Topic 1: Asana vs Github for project board
+Key Points Discussed:
+Asana felt more personable to use
+Asana is industry adopted and has alot of write up on how to use asana
+The project says to use Github projects but we still dont know if we can use asana
+Decisions Made: Asana will be used if signed off by the TA
+
+
+Topic 2: Sprints
+Summary: Whos going to handle what part of the project and how will our sprints look like
+Key Points Discussed:
+Week 1: Kayo,Yusuf and Miguel will do the back end by creating the User database, Exercise database.
+Week 1: Alex and Minh will create the different pages and design the color scheme
+Week 2: We will focus on testing both the front end and the back end to ensure they are no weird bugs or anything that could break our project
+Week: We will start with the integration layer and come up with the rest of the sprint by the end of week 2
+Decisions Made: How we will tackle the project first 2 weeks
