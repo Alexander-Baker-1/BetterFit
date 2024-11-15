@@ -153,6 +153,16 @@ app.post('/login', (req, res) => {
     });
 });
 
+// Authentication middleware.
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  next();
+};
+
+app.use(auth);
+
 // -------------------------------------  ROUTES for home.hbs   ----------------------------------------------
 
 app.get('/home', (req, res) => {
@@ -174,7 +184,7 @@ app.get('/profile', (req, res) => {
 
 app.get('/logout', (req, res) => {
   req.session.destroy();
-  res.render('pages/logout');
+  res.render('pages/login');
 });
 
 // -------------------------------------  START THE SERVER   ----------------------------------------------
