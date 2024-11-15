@@ -140,7 +140,7 @@ app.post('/login', (req, res) => {
         req.session.save();
 
         // Redirect to the home page after successful login
-        res.redirect('pages/home');
+        res.redirect('/home');
       } else {
         // Password does not match
         res.redirect('/login');
@@ -179,7 +179,7 @@ app.get('/profile', (req, res) => {
 
 // -------------------------------------  ROUTES for home.hbs   ----------------------------------------------
 
-app.get('/', (req, res) => {
+app.get('/home', (req, res) => {
   res.render('pages/home', {
     username: req.session.user.username,
     first_name: req.session.user.first_name,
@@ -195,7 +195,6 @@ app.get('/logout', (req, res) => {
 });
 
 const axios = require('axios');
-require('dotenv').config();
 
 app.get('/recipes', (req, res) => {
   axios({
