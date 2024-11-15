@@ -110,7 +110,7 @@ app.post('/register', async (req, res) => {
 // -------------------------------------  ROUTES for login.hbs   ----------------------------------------------
 
 app.get('/', (req, res) => {
-  res.redirect('/login'); //this will call the /login route in the API
+  res.redirect('pages/home'); //this will call the /login route in the API
 });
 
 app.get('/login', (req, res) => {
@@ -140,7 +140,7 @@ app.post('/login', (req, res) => {
         req.session.save();
 
         // Redirect to the home page after successful login
-        res.redirect('pages/home');
+        res.redirect('/home');
       } else {
         // Password does not match
         res.redirect('/login');
@@ -153,7 +153,6 @@ app.post('/login', (req, res) => {
     });
 });
 
-
 // Authentication middleware.
 const auth = (req, res, next) => {
   if (!req.session.user) {
@@ -163,27 +162,21 @@ const auth = (req, res, next) => {
 };
 
 app.use(auth);
-app.get('/profile', (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).send('Not authenticated');
-  }
-  try {
-    res.status(200).json({
-      username: req.session.user.username,
-    });
-  } catch (err) {
-    console.error('Profile error:', err);
-    res.status(500).send('Internal Server Error');
-  }
-});
 
 // -------------------------------------  ROUTES for home.hbs   ----------------------------------------------
 
-app.get('/', (req, res) => {
+app.get('/home', (req, res) => {
   res.render('pages/home', {
     username: req.session.user.username,
-    first_name: req.session.user.first_name,
-    last_name: req.session.user.last_name,
+    first_name: req.session.user.fullname,
+  });
+});
+
+// -------------------------------------  ROUTES for profile.hbs   ----------------------------------------------
+
+app.get('/profile', (req, res) => {
+  res.render('pages/profile', {
+    password: req.session.user.password,
   });
 });
 
@@ -191,7 +184,7 @@ app.get('/', (req, res) => {
 
 app.get('/logout', (req, res) => {
   req.session.destroy();
-  res.render('pages/logout');
+  res.render('pages/login');
 });
 
 const axios = require('axios');
