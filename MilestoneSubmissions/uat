@@ -1,0 +1,39 @@
+1. Feature: Workout Entry
+Description: This feature allows users to log their workout activities into the system. Users can enter exercise types, duration, sets, reps, and any additional notes.
+Test Cases:
+Test Case 1: Basic Entry
+Data: User inputs "Running, 30 minutes, 0 sets, 0 reps".
+Activity: User navigates to the workout entry page, enters the data, and submits.
+Expected Result: The entry is saved, and a success message is displayed with details.
+Test Case 2: Edge Case Entry
+Data: User inputs "Bench Press, 3 sets, 0 reps..
+Activity: User enters details and submits.
+Expected Result: The system accepts entries with valid sets and reps, even with 0 reps, and displays a success message.
+Test Data: User-provided data with standard and edge-case scenarios. Test Environment: Localhost and cloud-based development servers. Test Results: Verify that entered workouts are saved in the database and retrievable. User Acceptance Testers: Selected users familiar with fitness tracking.
+
+2. Feature: Favorite Recipe Link
+Description: Users can mark their favorite recipe links to access them more easily within the app.
+Test Cases:
+Test Case 1: Mark as Favorite
+Data: Recipe link URL, e.g., "www.recipesite.com/recipe123".
+Activity: User clicks on a 'Favorite' button for a recipe link.
+Expected Result: The recipe link is marked as a favorite and displayed in the user's 'Favorites' section.
+Test Case 2: Unfavorite a Recipe
+Data: User's existing favorite recipe.
+Activity: User clicks to remove the recipe from favorites.
+Expected Result: The recipe is removed from the 'Favorites' section.
+Test Data: Pre-existing user accounts with recipes and new links for testing. Test Environment: Localhost for initial testing and cloud for UAT. Test Results: Verify recipes are added/removed correctly and display in the 'Favorites' section. User Acceptance Testers: Recipe enthusiasts among user pool.
+
+3. Feature: Change Username Upon Login
+Description: Users have the ability to change their username after logging in.
+Test Cases:
+Test Case 1: Successful Username Change
+Data: New username "User123Updated".
+Activity: User logs in, navigates to settings, updates the username, and saves changes.
+Expected Result: The system accepts the change, and the new username appears in profile and across relevant sections.
+Test Case 2: Duplicate Username Attempt
+Data: Existing username "User456".
+Activity: User tries to change their username to one already in use.
+Expected Result: The system rejects the change and displays an appropriate error message.
+Test Data: User accounts with varying levels of permissions. Test Environment: Initial testing on localhost followed by cloud-based UAT. Test Results: Confirmation that usernames are updated and reflect correctly across the user profile and system. User Acceptance Testers: Registered users willing to test username update functionalities.
+

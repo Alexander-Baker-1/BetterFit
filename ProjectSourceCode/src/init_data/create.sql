@@ -18,4 +18,3 @@ CREATE TABLE Exercise (
     type VARCHAR(10) CHECK (type IN ('Push', 'Pull', 'Other')),  -- Push or Pull classification
     muscle_group_id INT,
     FOREIGN KEY (muscle_group_id) REFERENCES MuscleGroup(muscle_group_id)
-);
