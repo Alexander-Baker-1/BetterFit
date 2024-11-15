@@ -194,6 +194,32 @@ app.get('/logout', (req, res) => {
   res.render('pages/logout');
 });
 
+const axios = require('axios');
+require('dotenv').config();
+
+app.get('/recipes', (req, res) => {
+  axios({
+    url: `https://api.edamam.com/api/recipes/v2`,
+    method: 'GET',
+    headers: {
+      'Accept-Encoding': 'application/json',
+    },
+    params: {
+      type: 'public',
+      app_id: 'd3d14f62', // Replace with your actual app ID
+      app_key: process.env.RECIPE_API_KEY, // Ensure your API key is in a .env file
+      q: 'chicken', // or any search term
+    },
+  })
+    .then(results => {
+      res.render('recipes', { recipes: results.data.hits });
+    })
+    .catch(error => {
+      console.error('Error fetching recipes:', error.message);
+      res.status(500).send('Error fetching recipes');
+    });
+});
+
 // -------------------------------------  START THE SERVER   ----------------------------------------------
 
 module.exports = app.listen(3000);
