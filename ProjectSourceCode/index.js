@@ -179,6 +179,35 @@ app.get('/profile', (req, res) => {
     password: req.session.user.password,
   });
 });
+app.post('/profile', (req, res) => {
+  const user = req.session.user; // Get the user object from the session
+  const newPassword = req.body.newPassword;
+
+  if (!user || !newPassword) {
+    console.error('User is not logged in or new password is not provided');
+    return res.status(400).send('User must be logged in and new password must be provided');
+  }
+
+  bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
+    if (err) {
+      console.error('Error hashing password:', err);
+      return res.status(500).send('Internal server error');
+    }
+
+    const updateQuery = 'UPDATE users SET password = $1 WHERE username = $2';
+
+    db.none(updateQuery, [hashedPassword, user.username]) // Use the username from the user object
+      .then(() => {
+        console.log('Password updated successfully');
+        res.redirect('/home');
+      })
+      .catch(err => {
+        console.error('Error updating password:', err);
+        res.status(500).send('Internal server error');
+      });
+  });
+});
+
 
 // -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------
 
