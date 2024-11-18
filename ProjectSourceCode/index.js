@@ -114,7 +114,7 @@ app.post('/register', async (req, res) => {
 // -------------------------------------  ROUTES for login.hbs   ----------------------------------------------
 
 app.get('/', (req, res) => {
-  res.redirect('/login'); //this will call the /login route in the API
+  res.redirect('pages/home'); //this will call the /login route in the API
 });
 
 app.get('/login', (req, res) => {
@@ -157,7 +157,6 @@ app.post('/login', (req, res) => {
     });
 });
 
-
 // Authentication middleware.
 const auth = (req, res, next) => {
   if (!req.session.user) {
@@ -167,27 +166,21 @@ const auth = (req, res, next) => {
 };
 
 app.use(auth);
-app.get('/profile', (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).send('Not authenticated');
-  }
-  try {
-    res.status(200).json({
-      username: req.session.user.username,
-    });
-  } catch (err) {
-    console.error('Profile error:', err);
-    res.status(500).send('Internal Server Error');
-  }
-});
 
 // -------------------------------------  ROUTES for home.hbs   ----------------------------------------------
 
 app.get('/home', (req, res) => {
   res.render('pages/home', {
     username: req.session.user.username,
-    first_name: req.session.user.first_name,
-    last_name: req.session.user.last_name,
+    first_name: req.session.user.fullname,
+  });
+});
+
+// -------------------------------------  ROUTES for profile.hbs   ----------------------------------------------
+
+app.get('/profile', (req, res) => {
+  res.render('pages/profile', {
+    password: req.session.user.password,
   });
 });
 
@@ -195,7 +188,7 @@ app.get('/home', (req, res) => {
 
 app.get('/logout', (req, res) => {
   req.session.destroy();
-  res.render('pages/logout');
+  res.render('pages/login');
 });
 
 const axios = require('axios');
@@ -209,13 +202,13 @@ app.get('/recipes', (req, res) => {
     },
     params: {
       type: 'public',
-      app_id: 'd3d14f62', // Replace with your actual app ID
-      app_key: process.env.RECIPE_API_KEY, // Ensure your API key is in a .env file
-      q: 'chicken', // or any search term
+      app_id: "d3d14f62", // Replace with your actual app ID
+      app_key: process.env.RECIPE_KEY, // Ensure your API key is in a .env file
+      q: 'vegan', // or any search term
     },
   })
     .then(results => {
-      res.render('recipes', { recipes: results.data.hits });
+      res.render('pages/recipes', { recipes: results.data.hits });
     })
     .catch(error => {
       console.error('Error fetching recipes:', error.message);

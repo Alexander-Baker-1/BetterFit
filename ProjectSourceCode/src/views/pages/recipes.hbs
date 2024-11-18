@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipes</title>
+</head>
+<body>
+  <h1>Recipe Results</h1>
+  <ul>
+    {{#each recipes}}
+      <li>
+        <h2>{{this.recipe.label}}</h2>
+        <img src="{{this.recipe.image}}" alt="{{this.recipe.label}}" style="width:150px;">
+        <p><a href="{{this.recipe.url}}" target="_blank">View Recipe</a></p>
+      </li>
+    {{/each}}
+  </ul>
+</body>
+</html>
