@@ -95,3 +95,40 @@ describe('Testing Add User API', () => {
     });
   });
   
+  describe('Testing Profile Update API', () => {
+    // Mock login to set session user for testing
+    let agent = chai.request.agent(server);
+  
+    before(done => {
+      agent
+        .post('/login')
+        .send({ username: 'nvm', password: 'password123' }) // Replace with a valid username and password
+        .end((err, res) => {
+          expect(res).to.have.status(302); // Expect a redirect on successful login
+          done();
+        });
+    });
+  
+    it('should update the password successfully and redirect to /home', done => {
+      agent
+        .post('/profile') // Assuming you changed your app.put() to app.post()
+        .send({ newPassword: 'newPassword123' })
+        .redirects(0)
+        .end((err, res) => {
+          expect(res).to.have.status(302); // Expect a redirect after successful update
+          expect(res.headers['location']).to.include('/home'); // Verify redirect location
+          done();
+        });
+    });
+  
+    it('should fail when no new password is provided and return a 400 status', done => {
+      agent
+        .post('/profile')
+        .send({}) // Send an empty body to simulate missing password
+        .end((err, res) => {
+          expect(res).to.have.status(400); // Expect a bad request status
+          assert.strictEqual(res.text, 'Invalid request: Missing username or password'); // Match error message
+          done();
+        });
+    });
+  });

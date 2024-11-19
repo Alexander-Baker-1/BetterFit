@@ -69,7 +69,7 @@ const user = {
 
 // -------------------------------------  ROUTES for register.hbs   ---------------------------------------------- 
 app.get('/welcome', (req, res) => {
-  res.json({status: 'success', message: 'Welcome!'});
+  res.json({ status: 'success', message: 'Welcome!' });
 });
 
 app.get('/register', (req, res) => {
@@ -88,7 +88,7 @@ app.post('/register', async (req, res) => {
     console.log('Username:', fullname);
     console.log('Username:', username);
     console.log('Password:', password);
-     console.log('Username:', username);
+    console.log('Username:', username);
     const existingUser = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
     console.log('Existing user:', existingUser);
     if (existingUser) {
@@ -99,8 +99,8 @@ app.post('/register', async (req, res) => {
     }
     console.log('Attempting to insert new user into database');
     const hash = await bcrypt.hash(password, 10);
-    await db.query('INSERT INTO users (fullname, username, password ) VALUES ($1, $2, $3)', [fullname,username, hash]);
-        req.session.message = 'Registration successful! Please log in.';
+    await db.query('INSERT INTO users (fullname, username, password ) VALUES ($1, $2, $3)', [fullname, username, hash]);
+    req.session.message = 'Registration successful! Please log in.';
     req.session.error = false;
     return res.redirect('/login');
   } catch (err) {
@@ -178,11 +178,115 @@ app.get('/home', (req, res) => {
 
 // -------------------------------------  ROUTES for profile.hbs   ----------------------------------------------
 
-app.get('/profile', (req, res) => {
-  res.render('pages/profile', {
-    password: req.session.user.password,
+app.get('/profile', async (req, res) => {
+  // Check if the user object exists in the session and extract the username
+  let username;
+  if (req.session.user) {
+    username = req.session.user.username;
+  } else {
+    console.error('Username not found in session');
+    return res.status(400).send('User is not logged in');
+  }
+
+  console.log("Access profile for:", username);
+
+  try {
+    // Fetch user's goals
+    const user = await db.oneOrNone('SELECT goals FROM Users WHERE username = $1', [username]);
+    if (!user) {
+      console.error('User not found in the database');
+      return res.status(404).send('User not found');
+    }
+
+    // Fetch favorite recipes
+    const myFavoriteRecipe = await db.any('SELECT name FROM FavoriteRecipe');
+    console.log('Fetched recipes:', myFavoriteRecipe);
+
+    // Render the profile page with user data and recipes
+    res.render('pages/profile', {
+      password: req.session.user.password, // Use the password from the session if needed
+      recipes: myFavoriteRecipe,
+      goals: user.goals // Pass the goals to the template
+    });
+  } catch (err) {
+    console.error('Error fetching profile data:', err);
+    res.status(500).send('Internal server error');
+  }
+});
+
+
+app.post('/update-goals', async (req, res) => {
+  let username;
+
+  // Check if the user object exists in the session and extract the username
+  if (req.session.user) {
+    username = req.session.user.username;
+  } else {
+    console.error('Username not found in session');
+    return res.status(400).send('User is not logged in');
+  }
+
+  const newGoals = req.body.goals; // Extract goals from the form submission
+
+  try {
+    // Update the goals field for the user
+    await db.none('UPDATE Users SET goals = $1 WHERE username = $2', [newGoals, username]);
+    console.log(`Goals updated for user: ${username}`);
+
+    // Redirect back to the profile page after updating
+    res.redirect('/profile');
+  } catch (err) {
+    console.error('Error updating goals:', err);
+    res.status(500).send('Internal server error');
+  }
+});
+
+
+
+app.post('/profile', (req, res) => {
+  const user = req.session.user; // Get the user object from the session
+  const newPassword = req.body.newPassword;
+
+  if (!user || !newPassword) {
+    console.error('User is not logged in or new password is not provided');
+    return res.status(400).send('User must be logged in and new password must be provided');
+  }
+
+  bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
+    if (err) {
+      console.error('Error hashing password:', err);
+      return res.status(500).send('Internal server error');
+    }
+
+    const updateQuery = 'UPDATE users SET password = $1 WHERE username = $2';
+
+    db.none(updateQuery, [hashedPassword, user.username]) // Use the username from the user object
+      .then(() => {
+        console.log('Password updated successfully');
+        res.redirect('/home');
+      })
+      .catch(err => {
+        console.error('Error updating password:', err);
+        res.status(500).send('Internal server error');
+      });
   });
 });
+
+app.post('/remove-recipe', async (req, res) => {
+  const recipeName = req.body.recipeName; // Extract the recipe name from the form submission
+
+  const query = 'DELETE FROM FavoriteRecipe WHERE name = $1';
+
+  try {
+    await db.none(query, [recipeName]); // Execute the delete query
+    console.log(`Recipe removed: ${recipeName}`);
+    res.redirect('/profile'); // Redirect back to the profile page to refresh the list
+  } catch (err) {
+    console.error('Error removing recipe:', err);
+    res.status(500).send('Internal server error');
+  }
+});
+
 
 // -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------
 
