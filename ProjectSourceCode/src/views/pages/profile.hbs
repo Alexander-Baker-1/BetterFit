@@ -26,11 +26,25 @@
                                             <label for="password" class="form-label">Change Password</label>
                                             <input type="password" class="form-control" id="password"
                                                 name="newPassword">
-                                            <label for="goals" class="form-label">Goals</label>
-                                            <input type="text" class="form-control" id="goals" name="goals">
+
                                         </div>
                                         <button class="btn btn-primary" type="submit">Update</button>
                                     </form>
+                                    <div class="col-md-6">
+                                        <h4>Goals</h4>
+                                        {{#if goals}}
+                                        <p>{{goals}}</p>
+                                        {{else}}
+                                        <p>No goals set yet.</p>
+                                        {{/if}}
+                                        <form action="/update-goals" method="POST">
+                                            <label for="goals" class="form-label">Update Goals</label>
+                                            <textarea class="form-control" id="goals" name="goals"
+                                                rows="3">{{goals}}</textarea>
+                                            <button class="btn btn-primary mt-2" type="submit">Update Goals</button>
+                                        </form>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>

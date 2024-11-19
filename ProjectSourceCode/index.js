@@ -175,28 +175,70 @@ app.get('/home', (req, res) => {
 // -------------------------------------  ROUTES for profile.hbs   ----------------------------------------------
 
 app.get('/profile', async (req, res) => {
-  const query = 'SELECT name FROM FavoriteRecipe';
-  console.log("acces profile");
+  // Check if the user object exists in the session and extract the username
+  let username;
+  if (req.session.user) {
+    username = req.session.user.username;
+  } else {
+    console.error('Username not found in session');
+    return res.status(400).send('User is not logged in');
+  }
+
+  console.log("Access profile for:", username);
+
   try {
-    var myFavoriteRecipe = await db.any(query);
-    console.log(myFavoriteRecipe);
-    // db.any(query)
-    //   .then(recipes => {
-    //     console.log('Fetched recipes:', recipes); // Log the recipes to check the data
-    //     res.render('profile', { myFavoriteRecipe }); // Pass recipes to the template
-    //   })
-    //   .catch(err => {
-    //     console.error('Error fetching recipes:', err);
-    //     res.status(500).send('Internal server error');
-    //   });
+    // Fetch user's goals
+    const user = await db.oneOrNone('SELECT goals FROM Users WHERE username = $1', [username]);
+    if (!user) {
+      console.error('User not found in the database');
+      return res.status(404).send('User not found');
+    }
+
+    // Fetch favorite recipes
+    const myFavoriteRecipe = await db.any('SELECT name FROM FavoriteRecipe');
+    console.log('Fetched recipes:', myFavoriteRecipe);
+
+    // Render the profile page with user data and recipes
     res.render('pages/profile', {
-      password: req.session.user.password,
-      recipes: myFavoriteRecipe
+      password: req.session.user.password, // Use the password from the session if needed
+      recipes: myFavoriteRecipe,
+      goals: user.goals // Pass the goals to the template
     });
-  } catch {console.log("something went terrible")};
-
-
+  } catch (err) {
+    console.error('Error fetching profile data:', err);
+    res.status(500).send('Internal server error');
+  }
 });
+
+
+app.post('/update-goals', async (req, res) => {
+  let username;
+
+  // Check if the user object exists in the session and extract the username
+  if (req.session.user) {
+    username = req.session.user.username;
+  } else {
+    console.error('Username not found in session');
+    return res.status(400).send('User is not logged in');
+  }
+
+  const newGoals = req.body.goals; // Extract goals from the form submission
+
+  try {
+    // Update the goals field for the user
+    await db.none('UPDATE Users SET goals = $1 WHERE username = $2', [newGoals, username]);
+    console.log(`Goals updated for user: ${username}`);
+
+    // Redirect back to the profile page after updating
+    res.redirect('/profile');
+  } catch (err) {
+    console.error('Error updating goals:', err);
+    res.status(500).send('Internal server error');
+  }
+});
+
+
+
 app.post('/profile', (req, res) => {
   const user = req.session.user; // Get the user object from the session
   const newPassword = req.body.newPassword;
