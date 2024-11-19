@@ -65,7 +65,7 @@ const user = {
 
 // -------------------------------------  ROUTES for register.hbs   ---------------------------------------------- 
 app.get('/welcome', (req, res) => {
-  res.json({status: 'success', message: 'Welcome!'});
+  res.json({ status: 'success', message: 'Welcome!' });
 });
 
 app.get('/register', (req, res) => {
@@ -84,7 +84,7 @@ app.post('/register', async (req, res) => {
     console.log('Username:', fullname);
     console.log('Username:', username);
     console.log('Password:', password);
-     console.log('Username:', username);
+    console.log('Username:', username);
     const existingUser = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
     console.log('Existing user:', existingUser);
     if (existingUser) {
@@ -95,8 +95,8 @@ app.post('/register', async (req, res) => {
     }
     console.log('Attempting to insert new user into database');
     const hash = await bcrypt.hash(password, 10);
-    await db.query('INSERT INTO users (fullname, username, password ) VALUES ($1, $2, $3)', [fullname,username, hash]);
-        req.session.message = 'Registration successful! Please log in.';
+    await db.query('INSERT INTO users (fullname, username, password ) VALUES ($1, $2, $3)', [fullname, username, hash]);
+    req.session.message = 'Registration successful! Please log in.';
     req.session.error = false;
     return res.redirect('/login');
   } catch (err) {
@@ -174,10 +174,28 @@ app.get('/home', (req, res) => {
 
 // -------------------------------------  ROUTES for profile.hbs   ----------------------------------------------
 
-app.get('/profile', (req, res) => {
-  res.render('pages/profile', {
-    password: req.session.user.password,
-  });
+app.get('/profile', async (req, res) => {
+  const query = 'SELECT name FROM FavoriteRecipe';
+  console.log("acces profile");
+  try {
+    var myFavoriteRecipe = await db.any(query);
+    console.log(myFavoriteRecipe);
+    // db.any(query)
+    //   .then(recipes => {
+    //     console.log('Fetched recipes:', recipes); // Log the recipes to check the data
+    //     res.render('profile', { myFavoriteRecipe }); // Pass recipes to the template
+    //   })
+    //   .catch(err => {
+    //     console.error('Error fetching recipes:', err);
+    //     res.status(500).send('Internal server error');
+    //   });
+    res.render('pages/profile', {
+      password: req.session.user.password,
+      recipes: myFavoriteRecipe
+    });
+  } catch {console.log("something went terrible")};
+
+
 });
 app.post('/profile', (req, res) => {
   const user = req.session.user; // Get the user object from the session
@@ -207,6 +225,7 @@ app.post('/profile', (req, res) => {
       });
   });
 });
+
 
 
 // -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------

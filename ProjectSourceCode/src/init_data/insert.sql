@@ -55,8 +55,8 @@ VALUES
     ('Mountain Climbers', 'Cardio and core exercise', 'Beginner', 'Other', 6),
     ('Box Jump', 'Plyometric exercise for explosive leg power', 'Intermediate', 'Other', 3);
 
-    INSERT INTO FavoriteRecipe (name)
-VALUES 
+    
+INSERT INTO FavoriteRecipe (name) VALUES 
 ('Spaghetti Bolognese'), 
 ('Chicken Tikka Masala'), 
 ('Beef Stroganoff'), 
