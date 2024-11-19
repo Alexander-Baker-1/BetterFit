@@ -53,12 +53,16 @@
                                             <p>No favorite recipes found.</p>
                                             {{/if}}
                                         </div>
-                                        <label for="remove_favorite_recipe" class="form-label">Remove Favorite
-                                            Recipe</label>
-                                        <input type="text" class="form-control" id="remove_favorite_recipe"
-                                            name="remove_favorite_recipe">
+                                        <form action="/remove-recipe" method="POST">
+
+                                            <label for="remove_favorite_recipe" class="form-label">Remove Favorite
+                                                Recipe</label>
+                                            <input type="text" class="form-control" id="remove_favorite_recipe"
+                                                name="recipeName">
+                                            <button class="btn btn-primary" type="submit">Remove</button>
+
+                                        </form>
                                     </div>
-                                    <button class="btn btn-primary" type="submit">Remove</button>
                                 </div>
                             </div>
                         </div>

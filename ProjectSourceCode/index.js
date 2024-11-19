@@ -226,6 +226,20 @@ app.post('/profile', (req, res) => {
   });
 });
 
+app.post('/remove-recipe', async (req, res) => {
+  const recipeName = req.body.recipeName; // Extract the recipe name from the form submission
+
+  const query = 'DELETE FROM FavoriteRecipe WHERE name = $1';
+
+  try {
+    await db.none(query, [recipeName]); // Execute the delete query
+    console.log(`Recipe removed: ${recipeName}`);
+    res.redirect('/profile'); // Redirect back to the profile page to refresh the list
+  } catch (err) {
+    console.error('Error removing recipe:', err);
+    res.status(500).send('Internal server error');
+  }
+});
 
 
 // -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------
