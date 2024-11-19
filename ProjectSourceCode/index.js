@@ -35,6 +35,10 @@ app.use(
     extended: true,
   })
 );
+app.use(
+  '/static',
+  express.static(path.resolve(__dirname, 'src/resources'))
+);
 
 // -------------------------------------  DB CONFIG AND CONNECT   ---------------------------------------
 const dbConfig = {
