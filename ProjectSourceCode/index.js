@@ -95,14 +95,18 @@ app.post('/register', async (req, res) => {
       console.log('Username already taken');
       req.session.message = 'Username is already taken, please choose another one.';
       req.session.error = true;
-      return res.redirect('/register');
+      return  res.render('pages/register', {
+        message: `Username is already taken, please choose another one.`,
+      });
     }
     console.log('Attempting to insert new user into database');
     const hash = await bcrypt.hash(password, 10);
     await db.query('INSERT INTO users (fullname, username, password ) VALUES ($1, $2, $3)', [fullname, username, hash]);
     req.session.message = 'Registration successful! Please log in.';
     req.session.error = false;
-    return res.redirect('/login');
+    return res.render('pages/login', {
+      message: `Account created`,
+    });
   } catch (err) {
     console.error('Error inserting into users table:', err);
     req.session.message = 'An error occurred during registration. Please try again.';
@@ -147,7 +151,9 @@ app.post('/login', (req, res) => {
         res.redirect('/home');
       } else {
         // Password does not match
-        res.redirect('/login');
+        res.render('pages/login', {
+          message: `Incorrect login information`,
+        });
       }
     })
     .catch(err => {
@@ -214,7 +220,6 @@ app.get('/profile', async (req, res) => {
   }
 });
 
-
 app.post('/update-goals', async (req, res) => {
   let username;
 
@@ -233,15 +238,15 @@ app.post('/update-goals', async (req, res) => {
     await db.none('UPDATE Users SET goals = $1 WHERE username = $2', [newGoals, username]);
     console.log(`Goals updated for user: ${username}`);
 
-    // Redirect back to the profile page after updating
-    res.redirect('/profile');
+    // Render the profile page after updating
+    res.render('pages/profile', {
+      message: `Goals updated successfully`,
+    });
   } catch (err) {
     console.error('Error updating goals:', err);
     res.status(500).send('Internal server error');
   }
 });
-
-
 
 app.post('/profile', (req, res) => {
   const user = req.session.user; // Get the user object from the session
@@ -263,7 +268,9 @@ app.post('/profile', (req, res) => {
     db.none(updateQuery, [hashedPassword, user.username]) // Use the username from the user object
       .then(() => {
         console.log('Password updated successfully');
-        res.redirect('/home');
+        res.render('pages/profile', {
+        message: `Password updated successfully`,
+      });
       })
       .catch(err => {
         console.error('Error updating password:', err);
@@ -280,13 +287,14 @@ app.post('/remove-recipe', async (req, res) => {
   try {
     await db.none(query, [recipeName]); // Execute the delete query
     console.log(`Recipe removed: ${recipeName}`);
-    res.redirect('/profile'); // Redirect back to the profile page to refresh the list
+    res.render('pages/profile', {
+      message: `Recipe removed: ${recipeName}`,
+    }); // Render back to the profile page to refresh the list
   } catch (err) {
     console.error('Error removing recipe:', err);
     res.status(500).send('Internal server error');
   }
 });
-
 
 // -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------
 
