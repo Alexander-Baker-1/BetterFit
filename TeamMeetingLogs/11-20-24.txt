@@ -1,0 +1,12 @@
+Progress:
+- Decide not to do profile picture due to difficulty
+- Homepage is completed 
+- Done with reformatting the recipe search page, progress on tags and favorite functions
+For the rest of the week: 
+- Testing all features (logging in, adding favorite recipe, etc.)
+- Completing recipe page
+- Completing exercise page
+- Alex is working on confirmation messages
+- Miguel is working pages and templating for exercise pages
+- Minh is working on bootstrap and logo
+
