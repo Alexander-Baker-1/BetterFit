@@ -304,7 +304,6 @@ app.get('/logout', (req, res) => {
 });
 
 const axios = require('axios');
-
 app.get('/recipes', (req, res) => {
   axios({
     url: `https://api.edamam.com/api/recipes/v2`,
