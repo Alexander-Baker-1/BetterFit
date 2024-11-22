@@ -4,20 +4,101 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recipes</title>
+  <style>
+    /* General page styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f9f9f9;
+      height: 100vh;
+      overflow: hidden; /* Prevents scrolling on body */
+    }
+
+    /* Wrapper for scrollable content */
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 800px;
+      height: 90vh; /* Leave some space for margins */
+      overflow-y: auto; /* Makes the page scrollable */
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      width: 100%;
+    }
+
+    li {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    li img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
+    li h2 {
+      margin: 10px 0;
+      font-size: 18px;
+      color: #333;
+    }
+
+    li p a {
+      text-decoration: none;
+      color: #007BFF;
+      font-weight: bold;
+    }
+
+    li p a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-  <h1>Recipe Results</h1>
-  <ul>
-    {{#each recipes}}
-      <li>
-        <h2>{{this.recipe.label}}</h2>
-        <img src="{{this.recipe.image}}" alt="{{this.recipe.label}}" style="width:150px;">
-        <p><a href="{{this.recipe.url}}" target="_blank">View Recipe</a></p>
-      </li>
-    {{/each}}
-  </ul>
+  <div class="content-wrapper">
+    {{> message}}
+    <h1>Recipe Results</h1>
+    <ul>
+      {{#each recipes}}
+        <li>
+          <img src="{{this.recipe.image}}" alt="{{this.recipe.label}}">
+          <h2>{{this.recipe.label}}</h2>
+          <p><a href="{{this.recipe.url}}" target="_blank">View Recipe</a></p>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
 </body>
 </html>
+
 
 
 
