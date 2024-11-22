@@ -24,5 +24,6 @@ docker-compose exec db psql -U postgres
 
 ## Deployed Application
 https://betterfit-10l8.onrender.com
+
 ## Contributers
 Kayo Abdi, Alexander Baker, Yusuf Hanif, Minh Nguyen, Miguel Ramirez-Aleman
