@@ -5,7 +5,8 @@ The website also includes a comprehensive recipe section with a range of nutriti
 ## Installation
 
 ```bash
-
+docker-compose up -d
+docker-compose exec db psql -U postgres
 ```
 
 ## Usage
