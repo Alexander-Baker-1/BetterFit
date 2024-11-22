@@ -83,6 +83,7 @@
   </style>
 </head>
 <body>
+<<<<<<< HEAD
   <div class="content-wrapper">
     {{> message}}
     <h1>Recipe Results</h1>
@@ -96,6 +97,19 @@
       {{/each}}
     </ul>
   </div>
+=======
+  {{> message}}
+  <h1>Recipe Results</h1>
+  <ul>
+    {{#each recipes}}
+      <li>
+        <h2>{{this.recipe.label}}</h2>
+        <img src="{{this.recipe.image}}" alt="{{this.recipe.label}}" style="width:150px;">
+        <p><a href="{{this.recipe.url}}" target="_blank">View Recipe</a></p>
+      </li>
+    {{/each}}
+  </ul>
+>>>>>>> main
 </body>
 </html>
 

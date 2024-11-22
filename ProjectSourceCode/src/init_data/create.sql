@@ -2,7 +2,8 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   username VARCHAR(255) PRIMARY KEY,
   password VARCHAR(255) NOT NULL,
-  fullname VARCHAR(255) NOT NULL
+  fullname VARCHAR(255) NOT NULL,
+  goals VARCHAR(700)
 );
 
 CREATE TABLE MuscleGroup (
@@ -19,3 +20,10 @@ CREATE TABLE Exercise (
     muscle_group_id INT,
     FOREIGN KEY (muscle_group_id) REFERENCES MuscleGroup(muscle_group_id)
 );
+
+
+CREATE TABLE FavoriteRecipe (
+    recipe_id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
+

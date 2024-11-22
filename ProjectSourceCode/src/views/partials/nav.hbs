@@ -1,36 +1,64 @@
 <header>
- <nav class="navbar navbar-expand-sm border-bottom">
-   <div class="container">
-     <button
-       class="navbar-toggler ms-auto"
-       type="button"
-       data-bs-toggle="collapse"
-       data-bs-target="#navbar-collapse"
-       aria-controls="navbar"
-       aria-expanded="false"
-       aria-label="Toggle navigation">
-       <span class="navbar-toggler-icon"></span>
-     </button>
-     <div class="collapse navbar-collapse" id="navbar-collapse">
-       <ul class="navbar-nav me-auto">
-         <li class="nav-item">
-           <a class="nav-link" href='/home'>Home</a>
-         </li>
-       </ul>
-       <ul class="navbar-nav me-auto">
-         <li class="nav-item">
-           <a class="nav-link" href='/workouts'>Workouts</a>
-         </li>
-       </ul>
-       <ul class="navbar-nav me-auto">
-         <li class="nav-item">
-           <a class="nav-link" href='/recipes'>Recipes</a>
-         </li>
-       </ul>
-       <div class="nav-item me-1">
-         <a class="nav-link" href='/logout'>Logout</a>
-       </div>
-     </div>
-   </div>
- </nav>
+  <nav class="navbar navbar-expand-sm border-bottom" style="background-color: #E6E6FA;">
+    <div class="container ps-0">
+      <a class="navbar-brand ms-0" href="/home">
+        <img src="/static/img/favicon.ico" alt="Logo" width="30" height="30">
+      </a>
+      <button
+        class="navbar-toggler ms-auto"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbar-collapse"
+        aria-controls="navbar"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbar-collapse">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href='/home'>Home</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href='/workouts'>Workouts</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href='/recipes'>Recipes</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href='/profile'>Profile</a>
+          </li>
+        </ul>
+        <div class="nav-item me-1">
+          <a class="nav-link" href='/logout'>Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
 </header>
+
+<style>
+  @keyframes shimmer-wave {
+    0% {
+      background-position: -200% 0;
+    }
+    50% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  .navbar {
+    background: linear-gradient(90deg, #E6E6FA 10%, #d0c9e1 50%, #E6E6FA 90%);
+    background-size: 200% 100%;
+    animation: shimmer-wave 20s infinite ease-in-out;  
+  }
+</style>

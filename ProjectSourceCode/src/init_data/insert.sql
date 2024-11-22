@@ -54,3 +54,16 @@ VALUES
     ('Zottman Curl', 'Combines bicep curl and reverse curl for forearms', 'Intermediate', 'Pull', 4),
     ('Mountain Climbers', 'Cardio and core exercise', 'Beginner', 'Other', 6),
     ('Box Jump', 'Plyometric exercise for explosive leg power', 'Intermediate', 'Other', 3);
+
+    
+INSERT INTO FavoriteRecipe (name) VALUES 
+('Spaghetti Bolognese'), 
+('Chicken Tikka Masala'), 
+('Beef Stroganoff'), 
+('Vegetable Stir Fry'), 
+('Lemon Garlic Salmon'), 
+('BBQ Ribs'), 
+('Margarita Pizza'), 
+('Classic Cheeseburger'), 
+('Tacos al Pastor'), 
+('Pancakes with Maple Syrup');
