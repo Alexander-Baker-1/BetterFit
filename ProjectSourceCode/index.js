@@ -159,7 +159,9 @@ app.post('/login', (req, res) => {
     .catch(err => {
       console.log(err);
       // In case no user is found or another error occurs
-      res.redirect('/login');
+      res.render('pages/login', {
+        message: `Incorrect login information`,
+      });
     });
 });
 
