@@ -33,7 +33,7 @@ docker compose up -d
 ```
 ## Technology Stack 
 
-SQL, Postgres, Docker, NodeJS, Javascript, HTML, CSS, Bootstrap, Handlebars
+SQL, Postgres, Docker, NodeJS, JavaScript, HTML, CSS, Bootstrap, Handlebars
 
 ## Deployed Application
 https://betterfit-10l8.onrender.com
