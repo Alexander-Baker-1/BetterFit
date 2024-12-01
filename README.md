@@ -9,14 +9,14 @@ docker-compose up -d
 docker-compose exec db psql -U postgres
 ```
 
-Create a .env file under the ProjectSourceCode directory. This file should contain: < br / >
-POSTGRES_USER= < br / >
-POSTGRES_PASSWORD= < br / >
-POSTGRES_DB= < br / >
-SESSION_SECRET= < br / >
-HOST= < br / >
-RECIPE_KEY= < br / >
-RECIPE_APP_ID= < br / >
+Create a .env file under the ProjectSourceCode directory. This file should contain:\
+POSTGRES_USER=\
+POSTGRES_PASSWORD=\
+POSTGRES_DB=\
+SESSION_SECRET=\
+HOST=\
+RECIPE_KEY=\
+RECIPE_APP_ID=\
 
 ## Usage
 
