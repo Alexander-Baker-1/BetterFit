@@ -21,7 +21,7 @@ RECIPE_APP_ID=
 ## Usage
 
 ```bash
-
+docker compose up -d
 ```
 
 ## Test
@@ -29,7 +29,7 @@ RECIPE_APP_ID=
 In the docker-compose.yaml file, change command: 'npm start' to command: 'npm run testandrun'.
 
 ```bash
-
+docker compose up -d
 ```
 ## Technology Stack 
 
