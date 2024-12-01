@@ -26,6 +26,8 @@ RECIPE_APP_ID=
 
 ## Test
 
+In the docker-compose.yaml file, change command: 'npm start' to command: 'npm run testandrun'.
+
 ```bash
 
 ```
