@@ -477,9 +477,14 @@ app.delete('/user_exercises', (req, res) => {
 // -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------
 
 app.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.render('pages/login');
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send('Failed to log out.');
+    }
+    res.render('pages/logout');  
+  });
 });
+
 
 const axios = require('axios');
 app.get('/recipes', (req, res) => {
