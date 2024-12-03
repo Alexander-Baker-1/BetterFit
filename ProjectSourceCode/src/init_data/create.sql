@@ -30,6 +30,7 @@ CREATE TABLE user_exercises (
 
 CREATE TABLE FavoriteRecipe (
     recipe_id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
+    name VARCHAR(50) NOT NULL,
+    
 );
 
