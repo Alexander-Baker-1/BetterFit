@@ -21,6 +21,12 @@ CREATE TABLE Exercise (
     FOREIGN KEY (muscle_group_id) REFERENCES MuscleGroup(muscle_group_id)
 );
 
+DROP TABLE IF EXISTS user_exercises;
+CREATE TABLE user_exercises (
+  exercise_id INTEGER NOT NULL REFERENCES Exercise (exercise_id),
+  username VARCHAR(255) NOT NULL REFERENCES users (username),
+  PRIMARY KEY (exercise_id, username) -- ensures unique user-exercise combinations
+);
 
 CREATE TABLE FavoriteRecipe (
     recipe_id SERIAL PRIMARY KEY,

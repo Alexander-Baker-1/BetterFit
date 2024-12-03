@@ -1,0 +1,53 @@
+{{>message}}
+<div class="table-container">
+  <table class="styled-table">
+    <tr>
+      <th>Workout</th>
+      <th>Description</th>
+      <th>Difficulty</th>
+      <th>Actions</th>
+    </tr>
+    {{#each exercises}}
+    <tr>
+      <td>{{name}}</td>
+      <td>{{description}}</td>
+      <td>{{difficulty_level}}</td>
+      <td>
+        <form method="POST" action="/user_exercises">
+          <input type="hidden" name="muscle_group_id" value="{{muscle_group_id}}"/>
+          <input type="hidden" name="exercise_id" value="{{exercise_id}}" />
+          <button type="submit">Add</button>
+        </form>
+      </td>
+    </tr>
+    {{/each}}
+  </table>
+</div>
+
+
+<style>
+.table-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
+
+.styled-table {
+  width: 80%;
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 18px;
+  text-align: left;
+}
+
+.styled-table th, .styled-table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+}
+
+.styled-table th {
+  background-color: #f4f4f4;
+}
+
+  
+</style>
