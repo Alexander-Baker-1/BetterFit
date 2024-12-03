@@ -225,7 +225,6 @@ app.get('/profile', async (req, res) => {
 app.post('/update-goals', async (req, res) => {
   let username;
 
-  // Check if the user object exists in the session and extract the username
   if (req.session.user) {
     username = req.session.user.username;
   } else {
@@ -240,15 +239,25 @@ app.post('/update-goals', async (req, res) => {
     await db.none('UPDATE Users SET goals = $1 WHERE username = $2', [newGoals, username]);
     console.log(`Goals updated for user: ${username}`);
 
-    // Render the profile page after updating
+    // Fetch the updated goals
+    const updatedGoals = await db.one('SELECT goals FROM Users WHERE username = $1', [username]);
+
+    // Fetch the favorite recipes
+    const favoriteRecipes = await db.any('SELECT * FROM FavoriteRecipe');
+
+    // Render the profile page with updated goals and recipes
     res.render('pages/profile', {
       message: `Goals updated successfully`,
+      goals: updatedGoals.goals, // Pass the updated goals to the template
+      recipes: favoriteRecipes,  // Pass the favorite recipes to the template
     });
   } catch (err) {
     console.error('Error updating goals:', err);
     res.status(500).send('Internal server error');
   }
 });
+
+
 
 app.post('/profile', (req, res) => {
   const user = req.session.user; // Get the user object from the session
@@ -284,19 +293,27 @@ app.post('/profile', (req, res) => {
 app.post('/remove-recipe', async (req, res) => {
   const recipeName = req.body.recipeName; // Extract the recipe name from the form submission
 
-  const query = 'DELETE FROM FavoriteRecipe WHERE name = $1';
+  const deleteQuery = 'DELETE FROM FavoriteRecipe WHERE name = $1';
+  const selectQuery = 'SELECT * FROM FavoriteRecipe';
 
   try {
-    await db.none(query, [recipeName]); // Execute the delete query
-    console.log(`Recipe removed: ${recipeName}`);
+    // Delete the specified recipe
+    await db.none(deleteQuery, [recipeName]);
+
+    // Query the updated list of recipes
+    const recipes = await db.any(selectQuery);
+
+    // Render the profile page with the updated list
     res.render('pages/profile', {
       message: `Recipe removed: ${recipeName}`,
-    }); // Render back to the profile page to refresh the list
+      recipes: recipes, // Pass the updated list of recipes
+    });
   } catch (err) {
     console.error('Error removing recipe:', err);
     res.status(500).send('Internal server error');
   }
 });
+
 
 // -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------
 
