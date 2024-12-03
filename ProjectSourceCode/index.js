@@ -257,8 +257,6 @@ app.post('/update-goals', async (req, res) => {
   }
 });
 
-
-
 app.post('/profile', (req, res) => {
   const user = req.session.user; // Get the user object from the session
   const newPassword = req.body.newPassword;
@@ -362,7 +360,6 @@ app.post('/exercises', (req, res) => {
     });
 });
 
-
 // Handle POST request (Add exercise)
 app.post('/user_exercises', (req, res) => {
   const { exercise_id, muscle_group_id } = req.body;
@@ -452,10 +449,6 @@ app.post('/user_exercises', (req, res) => {
     });
 });
 
-
-
-
-
 // Handle DELETE request (Delete exercise)
 app.delete('/user_exercises', (req, res) => {
   const { exercise_id } = req.body;
@@ -480,38 +473,6 @@ app.delete('/user_exercises', (req, res) => {
     })
     .catch(err => res.status(500).send('Error checking exercise: ' + err.message));
 });
-
-// -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------
-
-app.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.render('pages/login');
-});
-
-const axios = require('axios');
-app.get('/recipes', (req, res) => {
-  axios({
-    url: `https://api.edamam.com/api/recipes/v2`,
-    method: 'GET',
-    headers: {
-      'Accept-Encoding': 'application/json',
-    },
-    params: {
-      type: 'public',
-      app_id: "d3d14f62", // Replace with your actual app ID
-      app_key: process.env.RECIPE_KEY, // Ensure your API key is in a .env file
-      q: 'vegan', // or any search term
-    },
-  })
-    .then(results => {
-      res.render('pages/recipes', { recipes: results.data.hits });
-    })
-    .catch(error => {
-      console.error('Error fetching recipes:', error.message);
-      res.status(500).send('Error fetching recipes');
-    });
-});
-
 
 // -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------
 
