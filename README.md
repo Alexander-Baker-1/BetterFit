@@ -9,18 +9,31 @@ docker-compose up -d
 docker-compose exec db psql -U postgres
 ```
 
+Create a .env file under the ProjectSourceCode directory. This file should contain:\
+POSTGRES_USER=\
+POSTGRES_PASSWORD=\
+POSTGRES_DB=\
+SESSION_SECRET=\
+HOST=\
+RECIPE_KEY=\
+RECIPE_APP_ID=
+
 ## Usage
 
 ```bash
-
+docker compose up -d
 ```
 
 ## Test
 
-```bash
+In the docker-compose.yaml file, change command: 'npm start' to command: 'npm run testandrun'.
 
+```bash
+docker compose up -d
 ```
 ## Technology Stack 
+
+SQL, Postgres, Docker, NodeJS, JavaScript, HTML, CSS, Bootstrap, Handlebars
 
 ## Deployed Application
 https://betterfit-10l8.onrender.com

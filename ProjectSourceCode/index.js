@@ -159,7 +159,9 @@ app.post('/login', (req, res) => {
     .catch(err => {
       console.log(err);
       // In case no user is found or another error occurs
-      res.redirect('/login');
+      res.render('pages/login', {
+        message: `Incorrect login information`,
+      });
     });
 });
 
@@ -223,7 +225,6 @@ app.get('/profile', async (req, res) => {
 app.post('/update-goals', async (req, res) => {
   let username;
 
-  // Check if the user object exists in the session and extract the username
   if (req.session.user) {
     username = req.session.user.username;
   } else {
@@ -238,9 +239,17 @@ app.post('/update-goals', async (req, res) => {
     await db.none('UPDATE Users SET goals = $1 WHERE username = $2', [newGoals, username]);
     console.log(`Goals updated for user: ${username}`);
 
-    // Render the profile page after updating
+    // Fetch the updated goals
+    const updatedGoals = await db.one('SELECT goals FROM Users WHERE username = $1', [username]);
+
+    // Fetch the favorite recipes
+    const favoriteRecipes = await db.any('SELECT * FROM FavoriteRecipe');
+
+    // Render the profile page with updated goals and recipes
     res.render('pages/profile', {
       message: `Goals updated successfully`,
+      goals: updatedGoals.goals, // Pass the updated goals to the template
+      recipes: favoriteRecipes,  // Pass the favorite recipes to the template
     });
   } catch (err) {
     console.error('Error updating goals:', err);
@@ -282,26 +291,200 @@ app.post('/profile', (req, res) => {
 app.post('/remove-recipe', async (req, res) => {
   const recipeName = req.body.recipeName; // Extract the recipe name from the form submission
 
-  const query = 'DELETE FROM FavoriteRecipe WHERE name = $1';
+  const deleteQuery = 'DELETE FROM FavoriteRecipe WHERE name = $1';
+  const selectQuery = 'SELECT * FROM FavoriteRecipe';
 
   try {
-    await db.none(query, [recipeName]); // Execute the delete query
-    console.log(`Recipe removed: ${recipeName}`);
+    // Delete the specified recipe
+    await db.none(deleteQuery, [recipeName]);
+
+    // Query the updated list of recipes
+    const recipes = await db.any(selectQuery);
+
+    // Render the profile page with the updated list
     res.render('pages/profile', {
       message: `Recipe removed: ${recipeName}`,
-    }); // Render back to the profile page to refresh the list
+      recipes: recipes, // Pass the updated list of recipes
+    });
   } catch (err) {
     console.error('Error removing recipe:', err);
     res.status(500).send('Internal server error');
   }
 });
 
+// -------------------------------------  ROUTES for exercise.hbs   ----------------------------------------------
+
+app.post('/exercises', (req, res) => {
+  const taken = req.query.taken; // Indicates if exercises are "taken" or not
+  const muscle_group_id = req.body.muscle_group_id; // Extract muscle group ID from request body
+  const username = req.session.user.username; // Get username from session
+
+  // Define queries
+  const user_exercises = `
+    SELECT e.*
+    FROM Exercise e
+    JOIN user_exercises ue ON e.exercise_id = ue.exercise_id
+    WHERE ue.username = $1
+  `;
+
+  const exercise_not_taken = `
+    SELECT * 
+    FROM Exercise e
+    WHERE e.muscle_group_id = $1 
+    AND NOT EXISTS (
+      SELECT 1 
+      FROM user_exercises ue 
+      WHERE ue.exercise_id = e.exercise_id AND ue.username = $2
+    )
+  `;
+
+  // Determine which query to use and set appropriate parameters
+  const query = taken ? user_exercises : exercise_not_taken;
+  const params = taken ? [username] : [muscle_group_id, username];
+
+  // Execute the query
+  db.any(query, params)
+    .then(exercises => {
+      console.log(exercises); // Debugging purposes
+      res.render('pages/exercises', {
+        exercises
+      });
+    })
+    .catch(err => {
+      console.error(err.message); // Log the error
+      res.render('pages/exercises', {
+        exercises: [],
+        error: true,
+        message: err.message,
+      });
+    });
+});
+
+// Handle POST request (Add exercise)
+app.post('/user_exercises', (req, res) => {
+  const { exercise_id, muscle_group_id } = req.body;
+  const username = req.session.user.username; // Get username from session or request body
+  const taken = req.query.taken; // Indicates whether to show "taken" exercises
+
+  // Ensure username is present (optional but recommended to handle errors)
+  if (!username) {
+    return res.status(400).send('Username is required');
+  }
+
+  // Queries to fetch exercises
+  const user_exercises_query = `
+    SELECT e.*
+    FROM Exercise e
+    JOIN user_exercises ue ON e.exercise_id = ue.exercise_id
+    WHERE ue.username = $1
+  `;
+
+  const exercises_not_taken_query = `
+    SELECT * 
+    FROM Exercise e
+    WHERE e.muscle_group_id = $1 
+    AND NOT EXISTS (
+      SELECT 1 
+      FROM user_exercises ue 
+      WHERE ue.exercise_id = e.exercise_id AND ue.username = $2
+    )
+  `;
+
+  // Insert the exercise_id into user_exercises if not already taken
+  db.oneOrNone('SELECT * FROM user_exercises WHERE exercise_id = $1 AND username = $2', [exercise_id, username])
+    .then(exercise => {
+      if (exercise) {
+        req.session.message = 'Exercise already added';
+        req.session.error = true;
+
+        // Fetch the appropriate exercises list based on the `taken` flag
+        const query = taken ? user_exercises_query : exercises_not_taken_query;
+        const params = taken ? [username] : [muscle_group_id, username];
+
+        return db.any(query, params).then(exercises => {
+          return res.render('pages/exercises', {
+            exercises,
+            message: req.session.message,
+            error: req.session.error,
+          });
+        });
+      }
+
+      // Insert new exercise
+      db.none('INSERT INTO user_exercises (exercise_id, username) VALUES ($1, $2)', [exercise_id, username])
+        .then(() => {
+          req.session.message = 'Exercise successfully added';
+          req.session.error = false;
+
+          // Fetch the updated exercises list based on the `taken` flag
+          const query = taken ? user_exercises_query : exercises_not_taken_query;
+          const params = taken ? [username] : [muscle_group_id, username];
+
+          return db.any(query, params).then(exercises => {
+            return res.render('pages/exercises', {
+              exercises,
+              message: req.session.message,
+              error: req.session.error,
+            });
+          });
+        })
+        .catch(err => {
+          req.session.message = 'Error adding exercise: ' + err.message;
+          req.session.error = true;
+          return res.render('pages/exercises', {
+            exercises: [],
+            message: req.session.message,
+            error: req.session.error,
+          });
+        });
+    })
+    .catch(err => {
+      req.session.message = 'Error checking exercise: ' + err.message;
+      req.session.error = true;
+      return res.render('pages/exercises', {
+        exercises: [],
+        message: req.session.message,
+        error: req.session.error,
+      });
+    });
+});
+
+// Handle DELETE request (Delete exercise)
+app.delete('/user_exercises', (req, res) => {
+  const { exercise_id } = req.body;
+  const username = req.session.user.username; // Get username from session or request body
+
+  // Ensure username is present
+  if (!username) {
+    return res.status(400).send('Username is required');
+  }
+
+  // Check if the exercise exists for the user
+  db.oneOrNone('SELECT * FROM user_exercises WHERE exercise_id = $1 AND username = $2', [exercise_id, username])
+    .then(exercise => {
+      if (!exercise) {
+        return res.status(400).send('Exercise not found for this user');
+      }
+
+      // Delete the exercise for the user
+      db.none('DELETE FROM user_exercises WHERE exercise_id = $1 AND username = $2', [exercise_id, username])
+        .then(() => res.status(200).send('Exercise successfully deleted'))
+        .catch(err => res.status(500).send('Error deleting exercise: ' + err.message));
+    })
+    .catch(err => res.status(500).send('Error checking exercise: ' + err.message));
+});
+
 // -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------
 
 app.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.render('pages/login');
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send('Failed to log out.');
+    }
+    res.render('pages/logout');  
+  });
 });
+
 
 const axios = require('axios');
 app.get('/recipes', (req, res) => {
