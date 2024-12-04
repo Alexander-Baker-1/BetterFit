@@ -53,7 +53,13 @@ VALUES
     ('Landmine Row', 'Back exercise with single-arm variation for stability', 'Intermediate', 'Pull', 2),
     ('Zottman Curl', 'Combines bicep curl and reverse curl for forearms', 'Intermediate', 'Pull', 4),
     ('Mountain Climbers', 'Cardio and core exercise', 'Beginner', 'Other', 6),
-    ('Box Jump', 'Plyometric exercise for explosive leg power', 'Intermediate', 'Other', 3);
+    ('Box Jump', 'Plyometric exercise for explosive leg power', 'Intermediate', 'Other', 3),
+    ('Barbell Reverse Wrist Curls', 'Strengthens the forearm muscles by focusing primarily on the forearm extensor muscles.', 'Beginner', 'Other', 8),
+    ('Dumbell Wrist Curls', 'Strengthens the forearm muscles focusing on the forearm flexors.', 'Beginner', 'Other', 8),
+    ('Reverse Barbell Curls', 'Strengthens the forearm muscles and targets the forearm extensor muscles.', 'Beginner', 'Other', 8),
+    ('Reverse Wrist Curls', 'Strengthens the forearm muscles by pulling and rolling.', 'Beginner', 'Other', 8),
+    ('Bar Hang', 'Bar Hangs build grip strength, forearm endurance, and shoulder stability.', 'Intermediate', 'Other', 8),
+    ('Towel Pullups', 'Improves grip strength by doubling the amount of wokr your forearms do in a pullup.', 'Advanced', 'Other', 8);
 
     
 INSERT INTO FavoriteRecipe (name) VALUES 
