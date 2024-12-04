@@ -180,7 +180,7 @@ app.use(auth);
 app.get('/home', (req, res) => {
   res.render('pages/home', {
     username: req.session.user.username,
-    first_name: req.session.user.fullname,
+    fullname: req.session.user.fullname,
   });
 });
 
@@ -212,6 +212,7 @@ app.get('/profile', async (req, res) => {
 
     // Render the profile page with user data and recipes
     res.render('pages/profile', {
+      fullname: req.session.user.fullname,
       password: req.session.user.password, // Use the password from the session if needed
       recipes: myFavoriteRecipe,
       goals: user.goals // Pass the goals to the template
@@ -449,30 +450,114 @@ app.post('/user_exercises', (req, res) => {
     });
 });
 
-// Handle DELETE request (Delete exercise)
-app.delete('/user_exercises', (req, res) => {
-  const { exercise_id } = req.body;
-  const username = req.session.user.username; // Get username from session or request body
+// -------------------------------------  ROUTES for workouts.hbs   ----------------------------------------------
+
+app.get('/workouts', (req, res) => {
+  const user = req.session.user;
+
+  if (!user || !user.username) {
+    return res.status(401).render('pages/login', {
+      message: 'Please log in to access your workouts.',
+    });
+  }
+
+  const user_exercises = `
+    SELECT e.*, mg.name AS muscle_group_name
+    FROM Exercise e
+    JOIN user_exercises ue ON e.exercise_id = ue.exercise_id
+    JOIN MuscleGroup mg ON e.muscle_group_id = mg.muscle_group_id
+    WHERE ue.username = $1
+    ORDER BY e.muscle_group_id
+  `;
+
+  db.any(user_exercises, [user.username])
+    .then(exercises => {
+      res.render('pages/workouts', {
+        exercises,
+      });
+    })
+    .catch(err => {
+      console.error(err.message);
+      res.render('pages/exercises', {
+        exercises: [],
+        error: true,
+        message: 'Failed to load workouts: ' + err.message,
+      });
+    });
+});
+
+
+app.post('/workouts', (req, res) => {
+  const { exercise_id } = req.body;  // Get exercise_id from request body
+  const username = req.session.user.username; // Get username from session
 
   // Ensure username is present
   if (!username) {
     return res.status(400).send('Username is required');
   }
 
+  // Query to check if the exercise exists for the user
+  const user_exercises_query = `
+    SELECT e.*, mg.name AS muscle_group_name
+    FROM Exercise e
+    JOIN user_exercises ue ON e.exercise_id = ue.exercise_id
+    JOIN MuscleGroup mg ON e.muscle_group_id = mg.muscle_group_id
+    WHERE ue.username = $1 AND e.exercise_id = $2
+  `;
+
   // Check if the exercise exists for the user
-  db.oneOrNone('SELECT * FROM user_exercises WHERE exercise_id = $1 AND username = $2', [exercise_id, username])
+  db.oneOrNone(user_exercises_query, [username, exercise_id])
     .then(exercise => {
       if (!exercise) {
         return res.status(400).send('Exercise not found for this user');
       }
 
-      // Delete the exercise for the user
+      // Proceed with the deletion
       db.none('DELETE FROM user_exercises WHERE exercise_id = $1 AND username = $2', [exercise_id, username])
-        .then(() => res.status(200).send('Exercise successfully deleted'))
-        .catch(err => res.status(500).send('Error deleting exercise: ' + err.message));
+        .then(() => {
+          req.session.message = 'Exercise successfully removed';
+          req.session.error = false;
+
+          // Query to fetch updated list of exercises for the user
+          const exercises_query = `
+            SELECT e.*, mg.name AS muscle_group_name
+            FROM Exercise e
+            JOIN user_exercises ue ON e.exercise_id = ue.exercise_id
+            JOIN MuscleGroup mg ON e.muscle_group_id = mg.muscle_group_id
+            WHERE ue.username = $1
+            ORDER BY e.muscle_group_id
+          `;
+
+          return db.any(exercises_query, [username])
+            .then(exercises => {
+              return res.render('pages/workouts', {
+                exercises,
+                message: req.session.message,
+                error: req.session.error,
+              });
+            });
+        })
+        .catch(err => {
+          req.session.message = 'Error removing exercise: ' + err.message;
+          req.session.error = true;
+          return res.render('pages/workouts', {
+            exercises: [],
+            message: req.session.message,
+            error: req.session.error,
+          });
+        });
     })
-    .catch(err => res.status(500).send('Error checking exercise: ' + err.message));
+    .catch(err => {
+      req.session.message = 'Error checking exercise: ' + err.message;
+      req.session.error = true;
+      return res.render('pages/workouts', {
+        exercises: [],
+        message: req.session.message,
+        error: req.session.error,
+      });
+    });
 });
+
 
 // -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------
 

@@ -1,0 +1,54 @@
+<div class="table-container">
+  <table class="styled-table">
+    <tr>
+      <th>Workout</th>
+      <th>Description</th>
+      <th>Difficulty</th>
+      <th>Muscle Group</th> <!-- New column for Muscle Group -->
+      <th>Actions</th>
+    </tr>
+    {{#each exercises}}
+    <tr>
+      <td>{{name}}</td>
+      <td>{{description}}</td>
+      <td>{{difficulty_level}}</td>
+      <td>{{muscle_group_name}}</td> <!-- Display muscle group name -->
+      <td>
+        <form method="post" action="/workouts">
+          <input type="hidden" name="exercise_id" value="{{exercise_id}}" />
+          <button type="submit">Remove</button>
+        </form>
+      </td>
+    </tr>
+    {{/each}}
+  </table>
+</div>
+
+
+
+<style>
+.table-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
+
+.styled-table {
+  width: 80%;
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 18px;
+  text-align: left;
+}
+
+.styled-table th, .styled-table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+}
+
+.styled-table th {
+  background-color: #f4f4f4;
+}
+
+  
+</style>
