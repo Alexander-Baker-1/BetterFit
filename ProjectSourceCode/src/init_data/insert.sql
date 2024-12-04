@@ -1,20 +1,20 @@
 
 INSERT INTO MuscleGroup (name)
-VALUES ('Chest'), ('Back'), ('Legs'), ('Arms'), ('Shoulders'), ('Abs');
+VALUES ('Chest'), ('Back'), ('Legs'), ('Biceps'), ('Shoulders'), ('Abs'), ('Triceps'), ('Forearms');
 
 INSERT INTO Exercise (name, description, difficulty_level, type, muscle_group_id)
 VALUES 
     ('Bench Press', 'Targets the chest', 'Intermediate', 'Push', 1),
     ('Pull-Up', 'Targets the back', 'Advanced', 'Pull', 2),
     ('Squat', 'Targets the legs', 'Intermediate', 'Other', 3),
-    ('Bicep Curl', 'Targets the arms', 'Beginner', 'Pull', 4),
+    ('Bicep Curl', 'Targets the biceps', 'Beginner', 'Pull', 4),
     ('Shoulder Press', 'Targets the shoulders', 'Intermediate', 'Push', 5),
     ('Crunches', 'Targets the abs', 'Beginner', 'Other', 6),
     ('Deadlift', 'Targets the lower back and hamstrings', 'Advanced', 'Pull', 2),
     ('Push-Up', 'Works chest, shoulders, and triceps', 'Beginner', 'Push', 1),
     ('Leg Press', 'Targets the quadriceps and glutes', 'Intermediate', 'Push', 3),
     ('Lat Pulldown', 'Targets the latissimus dorsi', 'Intermediate', 'Pull', 2),
-    ('Tricep Extension', 'Isolates the triceps', 'Beginner', 'Push', 4),
+    ('Tricep Extension', 'Isolates the triceps', 'Beginner', 'Push', 7),
     ('Lunges', 'Targets quads, hamstrings, and glutes', 'Intermediate', 'Other', 3),
     ('Bicycle Crunch', 'Targets the abs and obliques', 'Beginner', 'Other', 6),
     ('Hammer Curl', 'Targets the brachialis and biceps', 'Beginner', 'Pull', 4),
@@ -22,7 +22,7 @@ VALUES
     ('Seated Row', 'Targets the upper back', 'Intermediate', 'Pull', 2),
     ('Leg Curl', 'Isolates the hamstrings', 'Intermediate', 'Pull', 3),
     ('Plank', 'Targets core stability', 'Beginner', 'Other', 6),
-    ('Overhead Tricep Extension', 'Targets triceps', 'Intermediate', 'Push', 4),
+    ('Overhead Tricep Extension', 'Targets triceps', 'Intermediate', 'Push', 7),
     ('Front Squat', 'Focuses on quads', 'Advanced', 'Other', 3),
     ('Incline Bench Press', 'Upper chest emphasis', 'Intermediate', 'Push', 1),
     ('Bent Over Row', 'Targets back and biceps', 'Intermediate', 'Pull', 2),
@@ -45,7 +45,7 @@ VALUES
     ('Inverted Row', 'Bodyweight exercise for back and arms', 'Beginner', 'Pull', 2),
     ('Hip Thrust', 'Glute isolation for lower body power', 'Intermediate', 'Push', 3),
     ('Hanging Knee Raise', 'Focuses on lower abs and hip flexors', 'Intermediate', 'Other', 6),
-    ('Farmer’s Carry', 'Improves grip, core, and shoulder stability', 'Intermediate', 'Other', 4),
+    ('Farmer’s Carry', 'Improves grip, core, and shoulder stability', 'Intermediate', 'Other', 7),
     ('Wall Sit', 'Static leg exercise for endurance', 'Beginner', 'Other', 3),
     ('Landmine Press', 'Targets chest and shoulders with core stability', 'Intermediate', 'Push', 5),
     ('Pallof Press', 'Anti-rotation exercise for core stability', 'Intermediate', 'Push', 6),
