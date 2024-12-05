@@ -485,9 +485,13 @@ app.get('/logout', (req, res) => {
   });
 });
 
+// -------------------------------------  ROUTES for recipes.hbs   ----------------------------------------------
+
 
 const axios = require('axios');
+
 app.get('/recipes', (req, res) => {
+  const query = req.query.q || 'vegan'; // Default search term
   axios({
     url: `https://api.edamam.com/api/recipes/v2`,
     method: 'GET',
@@ -496,19 +500,38 @@ app.get('/recipes', (req, res) => {
     },
     params: {
       type: 'public',
-      app_id: "d3d14f62", // Replace with your actual app ID
-      app_key: process.env.RECIPE_KEY, // Ensure your API key is in a .env file
-      q: 'vegan', // or any search term
+      app_id: "d3d14f62",
+      app_key: process.env.RECIPE_KEY,
+      q: query,
     },
   })
     .then(results => {
-      res.render('pages/recipes', { recipes: results.data.hits });
+      // Preprocess recipes data
+      const recipes = results.data.hits.map(hit => {
+        const { recipe } = hit;
+        return {
+          label: recipe.label,
+          image: recipe.image,
+          url: recipe.url,
+          calories: recipe.calories.toFixed(1), // Preprocess calories
+          protein: recipe.totalNutrients.PROCNT
+            ? recipe.totalNutrients.PROCNT.quantity.toFixed(1)
+            : 'N/A', // Handle missing protein info
+          proteinUnit: recipe.totalNutrients.PROCNT
+            ? recipe.totalNutrients.PROCNT.unit
+            : '',
+        };
+      });
+
+      res.render('pages/recipes', { recipes, query });
     })
     .catch(error => {
       console.error('Error fetching recipes:', error.message);
       res.status(500).send('Error fetching recipes');
     });
 });
+
+
 
 // -------------------------------------  START THE SERVER   ----------------------------------------------
 
