@@ -27,9 +27,11 @@ CREATE TABLE user_exercises (
   username VARCHAR(255) NOT NULL REFERENCES users (username),
   PRIMARY KEY (exercise_id, username) -- ensures unique user-exercise combinations
 );
-
+DROP TABLE IF EXISTS FavoriteRecipe;
 CREATE TABLE FavoriteRecipe (
     recipe_id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
+    name VARCHAR(50) NOT NULL,
+    username VARCHAR(255) NOT NULL REFERENCES users(username)
 );
+
 

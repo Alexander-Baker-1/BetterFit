@@ -95,7 +95,7 @@ app.post('/register', async (req, res) => {
       console.log('Username already taken');
       req.session.message = 'Username is already taken, please choose another one.';
       req.session.error = true;
-      return  res.render('pages/register', {
+      return res.render('pages/register', {
         message: `Username is already taken, please choose another one.`,
       });
     }
@@ -207,8 +207,8 @@ app.get('/profile', async (req, res) => {
     }
 
     // Fetch favorite recipes
-    const myFavoriteRecipe = await db.any('SELECT name FROM FavoriteRecipe');
-    console.log('Fetched recipes:', myFavoriteRecipe);
+    const myFavoriteRecipe = await db.any('SELECT name FROM FavoriteRecipe WHERE username = $1', [username]);
+    console.log('Fetched recipes for user:', username, myFavoriteRecipe);
 
     // Render the profile page with user data and recipes
     res.render('pages/profile', {
@@ -279,8 +279,8 @@ app.post('/profile', (req, res) => {
       .then(() => {
         console.log('Password updated successfully');
         res.render('pages/profile', {
-        message: `Password updated successfully`,
-      });
+          message: `Password updated successfully`,
+        });
       })
       .catch(err => {
         console.error('Error updating password:', err);
@@ -566,7 +566,7 @@ app.get('/logout', (req, res) => {
     if (err) {
       return res.status(500).send('Failed to log out.');
     }
-    res.render('pages/logout');  
+    res.render('pages/logout');
   });
 });
 
@@ -616,35 +616,55 @@ app.get('/recipes', (req, res) => {
     });
 });
 
+// Endpoint to add a favorite recipe
 app.post('/favorite-recipe', async (req, res) => {
-  console.log('Request body:', req.body); // Log the incoming request data
-    const recipeName = req.body.name;
+  const recipeName = req.body.name;
+  const username = req.session?.user?.username; // Assume username is stored in the session
 
-  if (!recipeName) {
-      return res.status(400).json({ error: 'Recipe name is required.' });
+  if (!recipeName || !username) {
+    return res.status(400).json({ error: 'Recipe name and user authentication are required.' });
   }
 
-  const insertQuery = 'INSERT INTO FavoriteRecipe (name) VALUES ($1) RETURNING recipe_id, name';
-  const selectQuery = 'SELECT * FROM FavoriteRecipe';
+  const insertQuery = 'INSERT INTO FavoriteRecipe (name, username) VALUES ($1, $2) RETURNING recipe_id, name, username';
+  const selectQuery = 'SELECT * FROM FavoriteRecipe WHERE username = $1';
 
   try {
-      // Insert the recipe into the database
-      const insertedRecipe = await db.one(insertQuery, [recipeName]);
+    // Insert the recipe for the specific user
+    const insertedRecipe = await db.one(insertQuery, [recipeName, username]);
 
-      // Query the updated list of recipes
-      const recipes = await db.any(selectQuery);
+    // Query the updated list of recipes for the user
+    const recipes = await db.any(selectQuery, [username]);
 
-      // Respond with the updated list
-      res.status(201).json({ 
-          message: `Recipe favorited: ${recipeName}`, 
-          recipe: insertedRecipe, 
-          allRecipes: recipes 
-      });
+    // Respond with the updated list
+    res.status(201).json({
+      message: `Recipe favorited: ${recipeName}`,
+      recipe: insertedRecipe,
+      allRecipes: recipes
+    });
   } catch (error) {
-      console.error('Error favoriting recipe:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    console.error('Error favoriting recipe:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
+app.get('/favorite-recipes', async (req, res) => {
+  const username = req.session?.user?.username; // Get the logged-in user's username
+
+  if (!username) {
+    return res.status(400).json({ error: 'User authentication is required.' });
+  }
+
+  const selectQuery = 'SELECT * FROM FavoriteRecipe WHERE username = $1';
+
+  try {
+    const recipes = await db.any(selectQuery, [username]);
+    res.status(200).json({ recipes });
+  } catch (error) {
+    console.error('Error fetching favorite recipes:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 
 
