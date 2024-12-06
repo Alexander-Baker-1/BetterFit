@@ -167,15 +167,17 @@
     </div>
 
     <!-- Recipe Grid -->
+    <div class="recipe-grid">
+      {{#each recipes}}
         <div class="recipe-card">
-      <img src="{{this.image}}" alt="{{this.label}}">
-      <h2>{{this.label}}</h2>
-      <p>Calories: {{this.calories}}</p>
-      <p>Protein: {{this.protein}} g</p>
-      <a href="{{this.url}}" target="_blank" class="btn btn-link">View Recipe</a>
-      <button class="favorite-button" onclick="favoriteRecipe('{{this.label}}', '{{this.url}}', '{{this.image}}')">
-        Favorite
-      </button>
+          <img src="{{this.image}}" alt="{{this.label}}">
+          <h2>{{this.label}}</h2>
+          <p>Calories: {{this.calories}}</p>
+          <p>Protein: {{this.protein}} g</p>
+          <a href="{{this.url}}" target="_blank" class="btn btn-link">View Recipe</a>
+          <button class="favorite-button" onclick="favoriteRecipe('{{this.uri}}', '{{this.label}}', '{{this.image}}', '{{this.url}}')">Favorite</button>
+        </div>
+      {{/each}}
     </div>
 
     <!-- Pagination -->
@@ -219,32 +221,3 @@
   </script>
 </body>
 </html>
-
-<script>
-function favoriteRecipe(recipeLabel, recipeUrl, recipeImage) {
-  fetch('/favorites', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      name: recipeLabel,
-      url: recipeUrl,
-      image: recipeImage
-    }),
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      alert(data.message);
-    })
-    .catch(err => {
-      console.error('Error:', err);
-      alert('Error adding recipe to favorites. Please try again.');
-    });
-}
-</script>
