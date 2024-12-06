@@ -186,6 +186,9 @@ app.get('/home', (req, res) => {
 
 // -------------------------------------  ROUTES for profile.hbs   ----------------------------------------------
 
+const bcrypt = require('bcrypt'); // Ensure bcrypt is imported for password hashing
+
+// GET route for rendering the profile page
 app.get('/profile', async (req, res) => {
   // Check if the user object exists in the session and extract the username
   let username;
@@ -206,12 +209,16 @@ app.get('/profile', async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    // Fetch favorite recipes
-    const myFavoriteRecipe = await db.any('SELECT name FROM FavoriteRecipe');
+    // Fetch favorite recipes for the user
+    const myFavoriteRecipe = await db.any(
+      'SELECT name, url FROM FavoriteRecipe WHERE username = $1',
+      [username]
+    );
     console.log('Fetched recipes:', myFavoriteRecipe);
 
     // Render the profile page with user data and recipes
     res.render('pages/profile', {
+      fullname: req.session.user.fullname, // Pass the full name from the session
       password: req.session.user.password, // Use the password from the session if needed
       recipes: myFavoriteRecipe,
       goals: user.goals // Pass the goals to the template
@@ -222,6 +229,7 @@ app.get('/profile', async (req, res) => {
   }
 });
 
+// POST route to update user goals
 app.post('/update-goals', async (req, res) => {
   let username;
 
@@ -242,14 +250,18 @@ app.post('/update-goals', async (req, res) => {
     // Fetch the updated goals
     const updatedGoals = await db.one('SELECT goals FROM Users WHERE username = $1', [username]);
 
-    // Fetch the favorite recipes
-    const favoriteRecipes = await db.any('SELECT * FROM FavoriteRecipe');
+    // Fetch the favorite recipes for the user
+    const favoriteRecipes = await db.any(
+      'SELECT name, url FROM FavoriteRecipe WHERE username = $1',
+      [username]
+    );
 
     // Render the profile page with updated goals and recipes
     res.render('pages/profile', {
       message: `Goals updated successfully`,
+      fullname: req.session.user.fullname,
       goals: updatedGoals.goals, // Pass the updated goals to the template
-      recipes: favoriteRecipes,  // Pass the favorite recipes to the template
+      recipes: favoriteRecipes, // Pass the favorite recipes to the template
     });
   } catch (err) {
     console.error('Error updating goals:', err);
@@ -257,6 +269,7 @@ app.post('/update-goals', async (req, res) => {
   }
 });
 
+// POST route to update the user's password
 app.post('/profile', (req, res) => {
   const user = req.session.user; // Get the user object from the session
   const newPassword = req.body.newPassword;
@@ -272,14 +285,15 @@ app.post('/profile', (req, res) => {
       return res.status(500).send('Internal server error');
     }
 
-    const updateQuery = 'UPDATE users SET password = $1 WHERE username = $2';
+    const updateQuery = 'UPDATE Users SET password = $1 WHERE username = $2';
 
     db.none(updateQuery, [hashedPassword, user.username]) // Use the username from the user object
       .then(() => {
         console.log('Password updated successfully');
         res.render('pages/profile', {
-        message: `Password updated successfully`,
-      });
+          fullname: req.session.user.fullname,
+          message: `Password updated successfully`,
+        });
       })
       .catch(err => {
         console.error('Error updating password:', err);
@@ -288,21 +302,67 @@ app.post('/profile', (req, res) => {
   });
 });
 
+// POST route to favorite a recipe
+app.post('/favorites', async (req, res) => {
+  const { uri, label, image, url } = req.body;
+
+  if (!req.session.user) {
+    console.error('User not logged in');
+    return res.status(401).send('User must be logged in');
+  }
+
+  const username = req.session.user.username;
+
+  try {
+    // Check if the recipe is already favorited
+    const exists = await db.oneOrNone(
+      'SELECT * FROM FavoriteRecipe WHERE username = $1 AND name = $2',
+      [username, label]
+    );
+
+    if (exists) {
+      return res.status(400).json({ message: 'Recipe already favorited!' });
+    }
+
+    // Insert the recipe into the favorites table
+    await db.none(
+      'INSERT INTO FavoriteRecipe (username, name, image, url) VALUES ($1, $2, $3, $4)',
+      [username, label, image, url]
+    );
+
+    res.json({ message: 'Recipe added to favorites!' });
+  } catch (err) {
+    console.error('Error adding recipe to favorites:', err);
+    res.status(500).send('Internal server error');
+  }
+});
+
+// POST route to remove a favorite recipe
 app.post('/remove-recipe', async (req, res) => {
   const recipeName = req.body.recipeName; // Extract the recipe name from the form submission
 
-  const deleteQuery = 'DELETE FROM FavoriteRecipe WHERE name = $1';
-  const selectQuery = 'SELECT * FROM FavoriteRecipe';
+  if (!req.session.user) {
+    console.error('User not logged in');
+    return res.status(401).send('User must be logged in');
+  }
+
+  const username = req.session.user.username;
 
   try {
-    // Delete the specified recipe
-    await db.none(deleteQuery, [recipeName]);
+    // Delete the specified recipe for the user
+    await db.none('DELETE FROM FavoriteRecipe WHERE username = $1 AND name = $2', [
+      username,
+      recipeName,
+    ]);
 
     // Query the updated list of recipes
-    const recipes = await db.any(selectQuery);
+    const recipes = await db.any('SELECT name, url FROM FavoriteRecipe WHERE username = $1', [
+      username,
+    ]);
 
     // Render the profile page with the updated list
     res.render('pages/profile', {
+      fullname: req.session.user.fullname,
       message: `Recipe removed: ${recipeName}`,
       recipes: recipes, // Pass the updated list of recipes
     });
@@ -311,6 +371,7 @@ app.post('/remove-recipe', async (req, res) => {
     res.status(500).send('Internal server error');
   }
 });
+
 
 // -------------------------------------  ROUTES for exercise.hbs   ----------------------------------------------
 
