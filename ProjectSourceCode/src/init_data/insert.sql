@@ -60,5 +60,3 @@ VALUES
     ('Reverse Wrist Curls', 'Strengthens the forearm muscles by pulling and rolling.', 'Beginner', 'Other', 8),
     ('Bar Hang', 'Bar Hangs build grip strength, forearm endurance, and shoulder stability.', 'Intermediate', 'Other', 8),
     ('Towel Pullups', 'Improves grip strength by doubling the amount of wokr your forearms do in a pullup.', 'Advanced', 'Other', 8);
-
-    
