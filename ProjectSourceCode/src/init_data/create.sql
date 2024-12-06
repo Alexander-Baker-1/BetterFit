@@ -6,13 +6,11 @@ CREATE TABLE users (
   goals VARCHAR(700)
 );
 
-DROP TABLE IF EXISTS MuscleGroup;
 CREATE TABLE MuscleGroup (
     muscle_group_id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL
 );
 
-DROP TABLE IF EXISTS Exercise;
 CREATE TABLE Exercise (
     exercise_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -30,7 +28,6 @@ CREATE TABLE user_exercises (
   PRIMARY KEY (exercise_id, username) -- ensures unique user-exercise combinations
 );
 
-DROP TABLE IF EXISTS FavoriteRecipe;
 CREATE TABLE FavoriteRecipe (
     recipe_id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL
