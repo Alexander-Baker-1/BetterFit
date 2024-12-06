@@ -207,7 +207,7 @@ app.get('/profile', async (req, res) => {
     }
 
     // Fetch favorite recipes
-    const myFavoriteRecipe = await db.any('SELECT name FROM FavoriteRecipe');
+    const myFavoriteRecipe = await db.any('SELECT name FROM FavoriteRecipe WHERE username = $1', [username]);
     console.log('Fetched recipes:', myFavoriteRecipe);
 
     // Render the profile page with user data and recipes
@@ -617,22 +617,25 @@ app.get('/recipes', (req, res) => {
 });
 
 app.post('/favorite-recipe', async (req, res) => {
-  console.log('Request body:', req.body); // Log the incoming request data
-    const recipeName = req.body.name;
+  const recipeName = req.body.name;
+  const username = req.session?.user?.username; // Assume username is stored in the session
 
-  if (!recipeName) {
-      return res.status(400).json({ error: 'Recipe name is required.' });
+  console.log('Session data at favorite-recipe:', req.session?.user);
+  console.log('Inserting recipe:', { recipeName, username });
+
+  if (!recipeName || !username) {
+      return res.status(400).json({ error: 'Recipe name and user authentication are required.' });
   }
 
-  const insertQuery = 'INSERT INTO FavoriteRecipe (name) VALUES ($1) RETURNING recipe_id, name';
-  const selectQuery = 'SELECT * FROM FavoriteRecipe';
+  const insertQuery = 'INSERT INTO FavoriteRecipe (name, username) VALUES ($1, $2) RETURNING recipe_id, name, username';
+  const selectQuery = 'SELECT * FROM FavoriteRecipe WHERE username = $1';
 
   try {
-      // Insert the recipe into the database
-      const insertedRecipe = await db.one(insertQuery, [recipeName]);
+      // Insert the recipe for the specific user
+      const insertedRecipe = await db.one(insertQuery, [recipeName, username]);
 
-      // Query the updated list of recipes
-      const recipes = await db.any(selectQuery);
+      // Query the updated list of recipes for the user
+      const recipes = await db.any(selectQuery, [username]);
 
       // Respond with the updated list
       res.status(201).json({ 
@@ -645,6 +648,7 @@ app.post('/favorite-recipe', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
