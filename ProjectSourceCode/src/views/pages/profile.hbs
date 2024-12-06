@@ -72,23 +72,24 @@
                 <div class="card p-4">
                     <h4 class="card-title"><b>Favorite Recipes</b></h4>
                     {{#if recipes.length}}
-                    <ul class="list-group mb-3">
-                        {{#each recipes}}
-                        <li class="list-group-item">{{this.name}}</li>
-                        {{/each}}
-                    </ul>
+                    <div class="list-group mb-3">
+                    {{#each recipes}}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{this.url}}" target="_blank" class="text-decoration-none">{{this.name}}</a>
+                        <form action="/remove-recipe" method="POST" class="d-inline">
+                            <input type="hidden" name="recipeName" value="{{this.name}}">
+                            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                        </form>
+                        </div>
+                    </div>
+                    {{/each}}
+                    </div>
                     {{else}}
                     <p class="text-muted">No favorite recipes found.</p>
                     {{/if}}
-                    <form action="/remove-recipe" method="POST">
-                        <div class="mb-3">
-                            <label for="remove_favorite_recipe" class="form-label">Remove Favorite Recipe</label>
-                            <input type="text" class="form-control" id="remove_favorite_recipe" name="recipeName" placeholder="Recipe Name">
-                        </div>
-                        <button class="btn btn-custom w-100" type="submit">Remove</button>
-                    </form>
                 </div>
-            </div>
+                </div>
         </div>
     </div>
 
