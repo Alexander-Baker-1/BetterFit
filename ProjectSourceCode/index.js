@@ -186,8 +186,6 @@ app.get('/home', (req, res) => {
 
 // -------------------------------------  ROUTES for profile.hbs   ----------------------------------------------
 
-const bcrypt = require('bcrypt'); // Ensure bcrypt is imported for password hashing
-
 // GET route for rendering the profile page
 app.get('/profile', async (req, res) => {
   // Check if the user object exists in the session and extract the username
