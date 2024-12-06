@@ -13,6 +13,27 @@
       background-color: #f9f9f9;
     }
 
+    /* Top Suggestion Buttons */
+    .suggestions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .suggestions button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #007BFF;
+      color: white;
+    }
+
+    .suggestions button:hover {
+      background-color: #0056b3;
+    }
+
     /* Page Container */
     .container {
       margin: 20px auto;
@@ -21,29 +42,29 @@
     }
 
     /* Search Bar */
-.search-bar {
-  display: flex;
-  justify-content: center;
-  gap: 10px; /* Adds spacing between input and button */
-}
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px; /* Spacing between input and button */
+      margin-bottom: 20px;
+    }
 
-.search-bar input {
-  width: 70%; /* Adjusted width */
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 16px;
-}
+    .search-bar input {
+      width: 70%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
 
-.search-bar button {
-  padding: 10px 20px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
+    .search-bar button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
     .search-bar button:hover {
       background-color: #0056b3;
@@ -79,14 +100,10 @@
       color: #333;
     }
 
-    .recipe-card a {
-      color: #007BFF;
+    .recipe-card a, .recipe-card button {
+      display: inline-block;
+      margin: 5px 10px; /* Adds spacing between buttons */
       text-decoration: none;
-      font-weight: bold;
-    }
-
-    .recipe-card a:hover {
-      text-decoration: underline;
     }
 
     .favorite-button {
@@ -96,16 +113,49 @@
       padding: 10px 15px;
       border-radius: 5px;
       cursor: pointer;
-      margin-top: 10px;
     }
 
     .favorite-button:hover {
       background-color: #218838;
     }
+
+    /* Pagination Buttons */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .pagination button {
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      background-color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+
+    .pagination button.active {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+    }
+
+    .pagination button:hover {
+      background-color: #0056b3;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <!-- Navigation Bar -->
+  <!-- Top Search Suggestions -->
+  <div class="suggestions">
+    <button onclick="searchTerm('vegan')">Vegan</button>
+    <button onclick="searchTerm('healthy')">Healthy</button>
+    <button onclick="searchTerm('high protein')">High Protein</button>
+    <button onclick="searchTerm('keto')">Keto</button>
+    <button onclick="searchTerm('low carb')">Low Carb</button>
+  </div>
 
   <div class="container">
     <!-- Search Bar -->
@@ -123,41 +173,51 @@
           <img src="{{this.image}}" alt="{{this.label}}">
           <h2>{{this.label}}</h2>
           <p>Calories: {{this.calories}}</p>
-          <p>Protein: {{this.protein}} {{this.proteinUnit}}</p>
-          <a href="{{this.url}}" target="_blank">View Recipe</a>
-          <button class="favorite-button" onclick="favoriteRecipe('{{this.uri}}')">Favorite</button>
+          <p>Protein: {{this.protein}} g</p>
+          <a href="{{this.url}}" target="_blank" class="btn btn-link">View Recipe</a>
+          <button class="favorite-button" onclick="favoriteRecipe('{{this.uri}}', '{{this.label}}', '{{this.image}}', '{{this.url}}')">Favorite</button>
         </div>
       {{/each}}
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button onclick="changePage(1)" class="active">1</button>
+      <button onclick="changePage(2)">2</button>
+      <button onclick="changePage(3)">3</button>
+      <!-- Add as many buttons as needed -->
     </div>
   </div>
 
   <script>
-    // Handle favorite button clicks
-    function favoriteRecipe(recipeUri) {
+    function searchTerm(term) {
+      const queryField = document.querySelector('input[name="q"]');
+      queryField.value = term;
+      queryField.form.submit();
+    }
+
+    function favoriteRecipe(recipeUri, recipeLabel, recipeImage, recipeUrl) {
       fetch('/favorites', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ uri: recipeUri }),
+        body: JSON.stringify({
+          uri: recipeUri,
+          label: recipeLabel,
+          image: recipeImage,
+          url: recipeUrl,
+        }),
       })
-      .then(response => {
-        if (response.ok) {
-          alert('Recipe added to favorites!');
-        } else {
-          alert('Failed to add recipe to favorites.');
-        }
-      })
-      .catch(err => {
-        console.error('Error:', err);
-        alert('An error occurred.');
-      });
+        .then(response => response.json())
+        .then(data => alert(data.message || 'Recipe added to favorites!'))
+        .catch(err => console.error('Error:', err));
+    }
+
+    function changePage(pageNumber) {
+      // Add logic to handle pagination requests
+      alert(`Switch to page ${pageNumber}`);
     }
   </script>
 </body>
 </html>
-
-
-
-
-
