@@ -616,6 +616,36 @@ app.get('/recipes', (req, res) => {
     });
 });
 
+app.post('/favorite-recipe', async (req, res) => {
+  console.log('Request body:', req.body); // Log the incoming request data
+    const recipeName = req.body.name;
+
+  if (!recipeName) {
+      return res.status(400).json({ error: 'Recipe name is required.' });
+  }
+
+  const insertQuery = 'INSERT INTO FavoriteRecipe (name) VALUES ($1) RETURNING recipe_id, name';
+  const selectQuery = 'SELECT * FROM FavoriteRecipe';
+
+  try {
+      // Insert the recipe into the database
+      const insertedRecipe = await db.one(insertQuery, [recipeName]);
+
+      // Query the updated list of recipes
+      const recipes = await db.any(selectQuery);
+
+      // Respond with the updated list
+      res.status(201).json({ 
+          message: `Recipe favorited: ${recipeName}`, 
+          recipe: insertedRecipe, 
+          allRecipes: recipes 
+      });
+  } catch (error) {
+      console.error('Error favoriting recipe:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 
 // -------------------------------------  START THE SERVER   ----------------------------------------------

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,7 +46,8 @@
     .search-bar {
       display: flex;
       justify-content: center;
-      gap: 10px; /* Spacing between input and button */
+      gap: 10px;
+      /* Spacing between input and button */
       margin-bottom: 20px;
     }
 
@@ -100,9 +102,11 @@
       color: #333;
     }
 
-    .recipe-card a, .recipe-card button {
+    .recipe-card a,
+    .recipe-card button {
       display: inline-block;
-      margin: 5px 10px; /* Adds spacing between buttons */
+      margin: 5px 10px;
+      /* Adds spacing between buttons */
       text-decoration: none;
     }
 
@@ -147,6 +151,7 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Top Search Suggestions -->
   <div class="suggestions">
@@ -169,14 +174,14 @@
     <!-- Recipe Grid -->
     <div class="recipe-grid">
       {{#each recipes}}
-        <div class="recipe-card">
-          <img src="{{this.image}}" alt="{{this.label}}">
-          <h2>{{this.label}}</h2>
-          <p>Calories: {{this.calories}}</p>
-          <p>Protein: {{this.protein}} g</p>
-          <a href="{{this.url}}" target="_blank" class="btn btn-link">View Recipe</a>
-          <button class="favorite-button" onclick="favoriteRecipe('{{this.uri}}', '{{this.label}}', '{{this.image}}', '{{this.url}}')">Favorite</button>
-        </div>
+      <div class="recipe-card">
+        <img src="{{this.image}}" alt="{{this.label}}">
+        <h2>{{this.label}}</h2>
+        <p>Calories: {{this.calories}}</p>
+        <p>Protein: {{this.protein}} g</p>
+        <a href="{{this.url}}" target="_blank" class="btn btn-link">View Recipe</a>
+        <button class="favorite-button" onclick="favoriteRecipe('{{this.label}}')">Favorite</button>
+      </div>
       {{/each}}
     </div>
 
@@ -196,17 +201,14 @@
       queryField.form.submit();
     }
 
-    function favoriteRecipe(recipeUri, recipeLabel, recipeImage, recipeUrl) {
-      fetch('/favorites', {
+    function favoriteRecipe(recipeLabel) {
+      fetch('/favorite-recipe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          uri: recipeUri,
-          label: recipeLabel,
-          image: recipeImage,
-          url: recipeUrl,
+          name: recipeLabel, // Match back-end expectation
         }),
       })
         .then(response => response.json())
@@ -214,11 +216,12 @@
         .catch(err => console.error('Error:', err));
     }
 
+
     function changePage(pageNumber) {
       // Add logic to handle pagination requests
       alert(`Switch to page ${pageNumber}`);
     }
   </script>
 </body>
-</html>
 
+</html>

@@ -62,14 +62,3 @@ VALUES
     ('Towel Pullups', 'Improves grip strength by doubling the amount of wokr your forearms do in a pullup.', 'Advanced', 'Other', 8);
 
     
-INSERT INTO FavoriteRecipe (name) VALUES 
-('Spaghetti Bolognese'), 
-('Chicken Tikka Masala'), 
-('Beef Stroganoff'), 
-('Vegetable Stir Fry'), 
-('Lemon Garlic Salmon'), 
-('BBQ Ribs'), 
-('Margarita Pizza'), 
-('Classic Cheeseburger'), 
-('Tacos al Pastor'), 
-('Pancakes with Maple Syrup');
