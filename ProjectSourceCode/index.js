@@ -200,7 +200,7 @@ app.get('/profile', async (req, res) => {
 
   try {
     // Fetch user's goals
-    const user = await db.oneOrNone('SELECT goals FROM Users WHERE username = $1', [username]);
+    const user = await db.oneOrNone('SELECT goals FROM users WHERE username = $1', [username]);
     if (!user) {
       console.error('User not found in the database');
       return res.status(404).send('User not found');
@@ -241,7 +241,7 @@ app.post('/update-goals', async (req, res) => {
     console.log(`Goals updated for user: ${username}`);
 
     // Fetch the updated goals
-    const updatedGoals = await db.one('SELECT goals FROM Users WHERE username = $1', [username]);
+    const updatedGoals = await db.one('SELECT goals FROM users WHERE username = $1', [username]);
 
     // Fetch the favorite recipes
     const favoriteRecipes = await db.any('SELECT * FROM FavoriteRecipe');
